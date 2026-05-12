@@ -28,6 +28,7 @@ namespace MaterialAssetRestorerCore
                         MaterialAssetRestorerCore.Logger.LogDebug("Reading JSON file: " + file.FullName);
                         try
                         {
+                            // reading and parsing json file
                             string json = File.ReadAllText(file.FullName, Encoding.UTF8);
                             MaterialSetsWrapper materialContainerWrapper = Newtonsoft.Json.JsonConvert.DeserializeObject<MaterialSetsWrapper>(json);
                             
@@ -38,6 +39,7 @@ namespace MaterialAssetRestorerCore
 
                             foreach (MaterialInformationContainer container in materialContainerWrapper.MaterialSets)
                             {
+                                // validating the material container
                                 if (string.IsNullOrEmpty(container.BaseMaterial))
                                 {
                                     MaterialAssetRestorerCore.Logger.LogWarning($"Skipping entry in '{file.Name}': missing 'BaseMaterial'.");
@@ -54,6 +56,7 @@ namespace MaterialAssetRestorerCore
                                     continue;
                                 }
 
+                                // add it to the list of material information containers if valid
                                 MaterialInit.materialInformationContainers.Add(container);
                                 MaterialAssetRestorerCore.Logger.LogDebug(
                                     $"Registered: '{container.BaseMaterial}' -> '{container.ReplaceMaterial}'" +
