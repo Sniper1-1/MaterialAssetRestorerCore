@@ -2,7 +2,7 @@ using HarmonyLib;
 using UnityEngine;
 
 
-namespace MaterialAssetRestorerCore.Patches
+namespace MaterialAssetRestorer
 {
     [HarmonyPatch(typeof(StartOfRound))]
     public class MaterialInit

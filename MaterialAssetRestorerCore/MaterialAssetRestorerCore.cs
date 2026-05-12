@@ -4,7 +4,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 
-namespace MaterialAssetRestorerCore
+namespace MaterialAssetRestorer
 {
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class MaterialAssetRestorerCore : BaseUnityPlugin
@@ -21,11 +21,7 @@ namespace MaterialAssetRestorerCore
             Patch();
 
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");
-
-            //log current directory and files within
-            Logger.LogDebug($"Current directory: {new DirectoryInfo(Assembly.GetExecutingAssembly().Location).Parent.Parent}");
-            var files = new DirectoryInfo(Assembly.GetExecutingAssembly().Location).Parent.Parent.GetFiles();
-            Logger.LogDebug($"Files in current directory: {string.Join(", ", files.ToString())}");
+            Logger.LogInfo("Oh hi, M.A.R.C.");
         }
 
         internal static void Patch()
@@ -35,6 +31,7 @@ namespace MaterialAssetRestorerCore
             Logger.LogDebug("Patching...");
 
             Harmony.PatchAll();
+            JSONManager.ReadJSONfiles();
 
             Logger.LogDebug("Finished patching!");
         }

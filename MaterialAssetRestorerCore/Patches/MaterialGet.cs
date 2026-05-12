@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace MaterialAssetRestorerCore.Patches
+namespace MaterialAssetRestorer
 {
     public class MaterialGet
     {
