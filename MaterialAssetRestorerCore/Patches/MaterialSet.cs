@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace MaterialAssetRestorer
+namespace MaterialAssetRestorerCore
 {
     public class MaterialSet
     {

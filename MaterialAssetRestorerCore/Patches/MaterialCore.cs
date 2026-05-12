@@ -1,12 +1,15 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 
 
-namespace MaterialAssetRestorer
+namespace MaterialAssetRestorerCore
 {
     [HarmonyPatch(typeof(StartOfRound))]
     public class MaterialInit
     {
+        public static List<MaterialInformationContainer> materialInformationContainers = new List<MaterialInformationContainer>();
+
         public static Material WAR_company_flooded = null;
         public static Material WAR_cave = null;
         public static Material WAR_pool = null;
@@ -38,5 +41,22 @@ namespace MaterialAssetRestorer
             MaterialSet.SET_material("PoolWater", MaterialInit.WAR_pool);
             //MaterialSet.SET_material("VowWater", MaterialInit.WAR_adamance_march_vow);
         }
+    }
+
+    public struct MaterialInformationContainer
+    {
+        public MaterialInformationContainer(string materialToFindName, string materialToReplaceName, string prefabToSearchName, string sceneToSearchName, Material replacementMaterial)
+        {
+            this.BaseMaterial = materialToFindName;
+            this.ReplaceMaterial = materialToReplaceName;
+            this.PrefabName = prefabToSearchName;
+            this.SceneName = sceneToSearchName;
+            this.replacementMaterial = replacementMaterial;
+        }
+        public string BaseMaterial = null;
+        public string ReplaceMaterial = null;
+        public string PrefabName = null;
+        public string SceneName = null;
+        public Material replacementMaterial = null;
     }
 }

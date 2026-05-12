@@ -4,7 +4,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 
-namespace MaterialAssetRestorer
+namespace MaterialAssetRestorerCore
 {
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class MaterialAssetRestorerCore : BaseUnityPlugin
@@ -31,7 +31,7 @@ namespace MaterialAssetRestorer
             Logger.LogDebug("Patching...");
 
             Harmony.PatchAll();
-            JSONManager.ReadJSONfiles();
+            JSONManager.ReadJSONFiles();
 
             Logger.LogDebug("Finished patching!");
         }
