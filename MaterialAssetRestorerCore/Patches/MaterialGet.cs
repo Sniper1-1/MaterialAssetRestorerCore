@@ -5,12 +5,13 @@ namespace MaterialAssetRestorerCore
     public class MaterialGet
     {
         /// <summary>
-        /// Gets a material by name, optionally searching within a specific prefab.
+        /// Gets a material by name, optionally searching within a specific prefab or scene.
         /// </summary>
         /// <param name="materialToFind">The name of the material to find.</param>
         /// <param name="prefabToSearch">The name of the prefab to search within (optional).</param>
+        /// <param name="sceneToSearch">The name of the scene to search within (optional).</param>
         /// <returns>The found material, or null if not found.</returns>
-        public static Material GET_material(string materialToFind, string prefabToSearch=null) 
+        public static Material GET_material(string materialToFind, string prefabToSearch=null, string sceneToSearch=null) 
         {
             
             Material materialToReturn = null;

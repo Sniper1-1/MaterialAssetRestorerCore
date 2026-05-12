@@ -18,15 +18,23 @@ namespace MaterialAssetRestorerCore
         //after StartOfRound, initialize the materials
         [HarmonyPostfix]
         [HarmonyPatch("Start")]
-        public static void InitializeWaterMaterials()
+        public static void InitializeMaterials()
         {
-            MaterialAssetRestorerCore.Logger.LogInfo("Initializing water materials...");
-            WAR_company_flooded = MaterialGet.GET_material("Water_mat_04");
-            WAR_cave = MaterialGet.GET_material("CaveWater", "CaveWaterTile");
-            WAR_pool = MaterialGet.GET_material("PoolWater", "PoolTile");
-            //WAR_adamance_march_vow = WaterGet.GET_material("VowWater");
-
-        }                
+            MaterialAssetRestorerCore.Logger.LogInfo("Initializing materials...");
+            foreach (MaterialInformationContainer container in materialInformationContainers)
+            {
+                Material foundMaterial = MaterialGet.GET_material(container.BaseMaterial, container.PrefabName, container.SceneName);
+                if (foundMaterial != null)
+                {
+                    MaterialAssetRestorerCore.Logger.LogInfo($"Initialized material '{container.BaseMaterial}' for replacement.");
+                }
+                else
+                {
+                    MaterialAssetRestorerCore.Logger.LogWarning($"Failed to initialize material '{container.BaseMaterial}' for replacement. It will not be replaced.");
+                }
+            }
+            MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
+        }
     }
 
     [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.FinishGeneratingNewLevelClientRpc))]
@@ -43,6 +51,14 @@ namespace MaterialAssetRestorerCore
         }
     }
 
+    /// <summary>
+    /// Contains information required to identify and replace materials within a specific prefab and scene.
+    /// <c>BaseMaterial</c> - The name of the material to find.
+    /// <c>ReplaceMaterial</c> - The name of the material to replace.
+    /// <c>PrefabName</c> - The name of the prefab to search within.
+    /// <c>SceneName</c> - The name of the scene to search within.
+    /// <c>replacementMaterial</c> - The material itself to use as a replacement, found at runtime.
+    /// </summary>
     public struct MaterialInformationContainer
     {
         public MaterialInformationContainer(string materialToFindName, string materialToReplaceName, string prefabToSearchName, string sceneToSearchName, Material replacementMaterial)
