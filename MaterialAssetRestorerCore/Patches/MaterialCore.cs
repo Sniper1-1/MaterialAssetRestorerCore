@@ -27,6 +27,7 @@ namespace MaterialAssetRestorerCore
                 if (foundMaterial != null)
                 {
                     MaterialAssetRestorerCore.Logger.LogInfo($"Initialized material '{container.BaseMaterial}' for replacement.");
+                    container.replacementMaterial = foundMaterial;
                 }
                 else
                 {
@@ -43,11 +44,13 @@ namespace MaterialAssetRestorerCore
         [HarmonyPostfix]
         public static void SwapWaterMaterials()
         {
-            MaterialAssetRestorerCore.Logger.LogInfo("Swapping water materials...");
-            MaterialSet.SET_material("Flooded&GordionWater", MaterialInit.WAR_company_flooded);
-            MaterialSet.SET_material("CaveWater", MaterialInit.WAR_cave);
-            MaterialSet.SET_material("PoolWater", MaterialInit.WAR_pool);
-            //MaterialSet.SET_material("VowWater", MaterialInit.WAR_adamance_march_vow);
+            foreach (MaterialInformationContainer container in MaterialInit.materialInformationContainers)
+            {
+                if (container.replacementMaterial != null)
+                {
+                    MaterialSet.SET_material(container.ReplaceMaterial, container.replacementMaterial);
+                }
+            }
         }
     }
 
@@ -59,7 +62,7 @@ namespace MaterialAssetRestorerCore
     /// <c>SceneName</c> - The name of the scene to search within.
     /// <c>replacementMaterial</c> - The material itself to use as a replacement, found at runtime.
     /// </summary>
-    public struct MaterialInformationContainer
+    public class MaterialInformationContainer
     {
         public MaterialInformationContainer(string materialToFindName, string materialToReplaceName, string prefabToSearchName, string sceneToSearchName, Material replacementMaterial)
         {
