@@ -12,11 +12,6 @@ namespace MaterialAssetRestorerCore
     {
         public static List<MaterialInformationContainer> materialInformationContainers = new List<MaterialInformationContainer>();
 
-        public static Material WAR_company_flooded = null;
-        public static Material WAR_cave = null;
-        public static Material WAR_pool = null;
-        public static Material WAR_adamance_march_vow = null;
-
         //after StartOfRound, initialize the materials
         [HarmonyPostfix]
         [HarmonyPatch("Start")]
