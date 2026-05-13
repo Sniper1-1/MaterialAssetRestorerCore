@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace MaterialAssetRestorerCore
 {
+    [HarmonyPatch(typeof(StartOfRound))]
     public class MaterialInit
     {
         public static List<MaterialInformationContainer> materialInformationContainers = new List<MaterialInformationContainer>();
