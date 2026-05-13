@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MaterialAssetRestorerCore
 {
@@ -55,19 +58,48 @@ namespace MaterialAssetRestorerCore
                 }
             }
 
-            // else we check the current scene
-            else
+            else if (!string.IsNullOrEmpty(sceneToSearch))
             {
+                var scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneToSearch);
+                if (scene.IsValid() && !scene.isLoaded && scene.name != "SampleSceneRelay") //don't load scenes twice (mainly worried about SampleSceneRelay)
+                {
+                    MaterialAssetRestorerCore.Logger.LogDebug($"Found scene '{sceneToSearch}'.");
+                    SceneManager.LoadScene(sceneToSearch, LoadSceneMode.Additive);
+                }
+                if(!scene.IsValid())
+                {
+                    MaterialAssetRestorerCore.Logger.LogWarning($"Scene '{sceneToSearch}' not found.");
+                    return null;
+                }
+
                 var renderers = GameObject.FindObjectsOfType<Renderer>(true);
                 foreach (var renderer in renderers)
                 {
-                    if (renderer.sharedMaterial!=null && renderer.sharedMaterial.name == materialToFind)
+                    if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind)
                     {
-                        MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in scene.");
+                        MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in {sceneToSearch}.");
                         materialToReturn = renderer.sharedMaterial;
                     }
                 }
+
+                if(scene.isLoaded && scene.name != "SampleSceneRelay") { 
+                    SceneManager.UnloadSceneAsync(sceneToSearch);
+                }
             }
+
+            // else we check the current scene (most likely SampleSceneRelay)
+            //else
+            //{
+            //    var renderers = GameObject.FindObjectsOfType<Renderer>(true);
+            //    foreach (var renderer in renderers)
+            //    {
+            //        if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind)
+            //        {
+            //            MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in current scene.");
+            //            materialToReturn = renderer.sharedMaterial;
+            //        }
+            //    }
+            //}
 
             MaterialAssetRestorerCore.Logger.LogInfo($"Material '{materialToFind}' search completed. Found: {(materialToReturn != null ? "Yes" : "No")}");
             return materialToReturn;
