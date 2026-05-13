@@ -72,8 +72,8 @@ namespace MaterialAssetRestorerCore
                 {
                     MaterialAssetRestorerCore.Logger.LogDebug($"Attempting to access scene '{sceneToSearch}'.");
                     yield return SceneManager.LoadSceneAsync(sceneToSearch, LoadSceneMode.Additive);
-                    MaterialAssetRestorerCore.Logger.LogDebug($"Found scene '{sceneToSearch}'? {scene.isLoaded}");
                     scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneToSearch);
+                    MaterialAssetRestorerCore.Logger.LogDebug($"Found scene '{sceneToSearch}'? {scene.isLoaded}");
                     
                     if (!scene.IsValid())
                     {
