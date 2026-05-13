@@ -13,8 +13,9 @@ namespace MaterialAssetRestorerCore
         /// <param name="materialToFind">The name of the material to find.</param>
         /// <param name="prefabToSearch">The name of the prefab to search within (optional).</param>
         /// <param name="sceneToSearch">The name of the scene to search within (optional).</param>
-        /// <returns>The found material, or null if not found.</returns>
-        public static Material GET_material(string materialToFind, string prefabToSearch=null, string sceneToSearch=null) 
+        /// <param name="onComplete">Callback invoked with the found material, or null if not found.</param>
+        /// <returns>An IEnumerator to be used with StartCoroutine.</returns>
+        public static IEnumerator GET_material(string materialToFind, string prefabToSearch=null, string sceneToSearch=null, System.Action<Material> onComplete = null) 
         {
             
             Material materialToReturn = null;
@@ -22,60 +23,67 @@ namespace MaterialAssetRestorerCore
             if (string.IsNullOrEmpty(materialToFind)) 
             {
                 MaterialAssetRestorerCore.Logger.LogWarning("Material to find is null.");
-                return null; 
+                onComplete?.Invoke(null);
+                yield break;
             }
 
             // if a prefabToSearch is provided, try to find the material in that prefab first
             if (!string.IsNullOrEmpty(prefabToSearch))
             {
                 GameObject prefab = null;
-                var objects = Resources.FindObjectsOfTypeAll<GameObject>();
-                foreach (var obj in objects)
+                GameObject[] objects = Resources.FindObjectsOfTypeAll<GameObject>();
+                foreach (GameObject obj in objects)
                 {
                     if (obj.name == prefabToSearch)
                     {
-                        prefab = obj;   
+                        prefab = obj;
+                        break;
                     }
                 }
 
                 if (prefab == null)
                 {
                     MaterialAssetRestorerCore.Logger.LogWarning($"Prefab '{prefabToSearch}' not found.");
-                    return null;
+                    onComplete?.Invoke(null);
+                    yield break;
                 }
                 else
                 {
                     MaterialAssetRestorerCore.Logger.LogDebug($"Found prefab '{prefabToSearch}'.");
-                    var renderers = prefab.GetComponentsInChildren<Renderer>(true);
-                    foreach (var renderer in renderers)
+                    Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>(true);
+                    foreach (Renderer renderer in renderers)
                     {
-                        if (renderer.sharedMaterial.name == materialToFind)
+                        if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind)
                         {
                             MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in prefab '{prefabToSearch}'.");
                             materialToReturn= renderer.sharedMaterial;
+                            break;
                         }
                     }
                 }
             }
 
+            // check scenes if one is provided (and a prefab wasn't)
             else if (!string.IsNullOrEmpty(sceneToSearch))
             {
-                if (sceneToSearch != "SampleSceneRelay") //don't load SampleSceneRelay twice as I fear that will be bad
-                {
-                    MaterialAssetRestorerCore.Logger.LogDebug($"Found scene '{sceneToSearch}'.");
-                    SceneManager.LoadScene(sceneToSearch, LoadSceneMode.Additive);
+                var scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneToSearch);
 
-                    var scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneToSearch);
-                    if (scene.IsValid()) { 
-                        MaterialAssetRestorerCore.Logger.LogDebug($"Loaded scene '{sceneToSearch}'.");
-                    }
+                if (sceneToSearch != "SampleSceneRelay" && !scene.isLoaded) //don't load SampleSceneRelay (any scene, really, but mainly that one) twice as I fear that will be bad
+                {
+                    MaterialAssetRestorerCore.Logger.LogDebug($"Attempting to access scene '{sceneToSearch}'.");
+                    yield return SceneManager.LoadSceneAsync(sceneToSearch, LoadSceneMode.Additive);
+                    MaterialAssetRestorerCore.Logger.LogDebug($"Found scene '{sceneToSearch}'? {scene.isLoaded}");
+                    scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneToSearch);
+                    
                     if (!scene.IsValid())
                     {
                         MaterialAssetRestorerCore.Logger.LogWarning($"Scene '{sceneToSearch}' not found.");
-                        return null;
+                        onComplete?.Invoke(null);
+                        yield break;
                     }
                 }
 
+                //find materials
                 var renderers = GameObject.FindObjectsOfType<Renderer>(true);
                 foreach (var renderer in renderers)
                 {
@@ -83,31 +91,19 @@ namespace MaterialAssetRestorerCore
                     {
                         MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in {sceneToSearch}.");
                         materialToReturn = renderer.sharedMaterial;
+                        break;
                     }
                 }
 
-                if(sceneToSearch != "SampleSceneRelay") { 
-                    SceneManager.UnloadSceneAsync(sceneToSearch);
+                //unload scene (never SampleSceneRelay though)
+                if(sceneToSearch != "SampleSceneRelay" && scene.isLoaded) { 
+                    yield return SceneManager.UnloadSceneAsync(scene);
                     MaterialAssetRestorerCore.Logger.LogDebug($"Unloaded scene '{sceneToSearch}'.");
                 }
             }
 
-            // else we check the current scene (most likely SampleSceneRelay)
-            //else
-            //{
-            //    var renderers = GameObject.FindObjectsOfType<Renderer>(true);
-            //    foreach (var renderer in renderers)
-            //    {
-            //        if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind)
-            //        {
-            //            MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in current scene.");
-            //            materialToReturn = renderer.sharedMaterial;
-            //        }
-            //    }
-            //}
-
             MaterialAssetRestorerCore.Logger.LogInfo($"Material '{materialToFind}' search completed. Found: {(materialToReturn != null ? "Yes" : "No")}");
-            return materialToReturn;
+            onComplete?.Invoke(materialToReturn);
         }
     }
 }

@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using DunGen;
 using HarmonyLib;
 using UnityEngine;
 
@@ -18,13 +20,22 @@ namespace MaterialAssetRestorerCore
         //after StartOfRound, initialize the materials
         [HarmonyPostfix]
         [HarmonyPatch("Start")]
-        public static void InitializeMaterials()
+        public static void InitializeMaterialsPatch()
+        {
+            CoroutineHelper.Instance.StartCoroutine(MaterialInit.InitializeMaterialsCoroutine());
+        }
+        public static IEnumerator InitializeMaterialsCoroutine()
         {
             MaterialAssetRestorerCore.Logger.LogInfo("Initializing materials...");
             foreach (MaterialInformationContainer container in materialInformationContainers)
             {
-                Material foundMaterial = MaterialGet.GET_material(container.BaseMaterial, container.PrefabName, container.SceneName);
-                container.replacementMaterial = foundMaterial;
+                yield return MaterialGet.GET_material(container.BaseMaterial, container.PrefabName, container.SceneName, (foundMaterial) =>
+                {
+                    if (foundMaterial != null)
+                    {
+                        container.replacementMaterial = foundMaterial;
+                    }
+                });
             }
             MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
         }
