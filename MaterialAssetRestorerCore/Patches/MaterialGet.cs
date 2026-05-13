@@ -60,16 +60,20 @@ namespace MaterialAssetRestorerCore
 
             else if (!string.IsNullOrEmpty(sceneToSearch))
             {
-                var scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneToSearch);
-                if (scene.IsValid() && !scene.isLoaded && scene.name != "SampleSceneRelay") //don't load scenes twice (mainly worried about SampleSceneRelay)
+                if (sceneToSearch != "SampleSceneRelay") //don't load SampleSceneRelay twice as I fear that will be bad
                 {
                     MaterialAssetRestorerCore.Logger.LogDebug($"Found scene '{sceneToSearch}'.");
                     SceneManager.LoadScene(sceneToSearch, LoadSceneMode.Additive);
-                }
-                if(!scene.IsValid())
-                {
-                    MaterialAssetRestorerCore.Logger.LogWarning($"Scene '{sceneToSearch}' not found.");
-                    return null;
+
+                    var scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneToSearch);
+                    if (scene.IsValid()) { 
+                        MaterialAssetRestorerCore.Logger.LogDebug($"Loaded scene '{sceneToSearch}'.");
+                    }
+                    if (!scene.IsValid())
+                    {
+                        MaterialAssetRestorerCore.Logger.LogWarning($"Scene '{sceneToSearch}' not found.");
+                        return null;
+                    }
                 }
 
                 var renderers = GameObject.FindObjectsOfType<Renderer>(true);
@@ -82,8 +86,9 @@ namespace MaterialAssetRestorerCore
                     }
                 }
 
-                if(scene.isLoaded && scene.name != "SampleSceneRelay") { 
+                if(sceneToSearch != "SampleSceneRelay") { 
                     SceneManager.UnloadSceneAsync(sceneToSearch);
+                    MaterialAssetRestorerCore.Logger.LogDebug($"Unloaded scene '{sceneToSearch}'.");
                 }
             }
 

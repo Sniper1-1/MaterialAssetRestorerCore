@@ -24,15 +24,7 @@ namespace MaterialAssetRestorerCore
             foreach (MaterialInformationContainer container in materialInformationContainers)
             {
                 Material foundMaterial = MaterialGet.GET_material(container.BaseMaterial, container.PrefabName, container.SceneName);
-                if (foundMaterial != null)
-                {
-                    MaterialAssetRestorerCore.Logger.LogInfo($"Initialized material '{container.BaseMaterial}' for replacement.");
-                    container.replacementMaterial = foundMaterial;
-                }
-                else
-                {
-                    MaterialAssetRestorerCore.Logger.LogWarning($"Failed to initialize material '{container.BaseMaterial}' for replacement. It will not be replaced.");
-                }
+                container.replacementMaterial = foundMaterial;
             }
             MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
         }
