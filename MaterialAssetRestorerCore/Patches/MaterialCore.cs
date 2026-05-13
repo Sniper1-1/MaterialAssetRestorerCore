@@ -7,14 +7,13 @@ using UnityEngine;
 
 namespace MaterialAssetRestorerCore
 {
-    [HarmonyPatch(typeof(StartOfRound))]
     public class MaterialInit
     {
         public static List<MaterialInformationContainer> materialInformationContainers = new List<MaterialInformationContainer>();
 
         //after StartOfRound, initialize the materials
         [HarmonyPostfix]
-        [HarmonyPatch("Start")]
+        [HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.Start))]
         public static void InitializeMaterialsPatch()
         {
             CoroutineHelper.Instance.StartCoroutine(MaterialInit.InitializeMaterialsCoroutine());
