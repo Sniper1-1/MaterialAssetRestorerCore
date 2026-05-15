@@ -103,7 +103,7 @@ namespace MaterialAssetRestorerCore
             }
 
             MaterialAssetRestorerCore.Logger.LogInfo($"Material '{materialToFind}' search completed. Found: {(materialToReturn != null ? "Yes" : "No")}");
-            onComplete?.Invoke(materialToReturn);
+            onComplete?.Invoke(materialToReturn); // send the found material back to the caller
         }
     }
 }
