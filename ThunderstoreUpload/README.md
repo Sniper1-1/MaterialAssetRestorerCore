@@ -1,5 +1,5 @@
 
-# MaterialAssetRestorer
+# MaterialAssetRestorerCore
 Moon and interior devs are likely familiar with how poorly the certain assets rip when trying to design their levels. I made this tool to attempt to restore some at runtime. It can access materials both from within the vanilla prefabs and scenes. ([My thread in the LC Modding Discord](https://discord.com/channels/1168655651455639582/1245084720614604873))
 
 This mod works by searching through a moon after it is loaded to replace the broken ones from modded moons/interiors with the corresponding one from vanilla. API specs and example useage below.
