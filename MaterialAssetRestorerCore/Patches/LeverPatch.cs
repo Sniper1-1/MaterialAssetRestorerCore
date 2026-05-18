@@ -15,6 +15,7 @@ namespace MaterialAssetRestorerCore
             if(!MaterialInit.materialsInitialized){
                 trigger.disabledHoverTip = "[ M.A.R.C. still caching materials!]";
                 trigger.interactable = false;
+                return false;
             }            
             return true;
         }        
