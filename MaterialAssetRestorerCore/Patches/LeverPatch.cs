@@ -2,6 +2,7 @@
 using Dawn.Internal;
 using DunGen;
 using HarmonyLib;
+using UnityEngine;
 
 namespace MaterialAssetRestorerCore
 {
@@ -23,7 +24,7 @@ namespace MaterialAssetRestorerCore
 
     internal static class DawnLibLeverPatch
     {
-        [HarmonyPatch(typeof(Dawn.Internal.DawnMoonNetworker), nameof(Dawn.Internal.DawnMoonNetworker.CheckReadyAndUpdateUI)), HarmonyPrefix]
+        [HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.Start)), HarmonyPostfix]
         public static void LeverPatch()
         {
             CoroutineHelper.Instance.StartCoroutine(LeverUpdateLoop());
@@ -36,7 +37,7 @@ namespace MaterialAssetRestorerCore
                 StartMatchLeverRefs.Instance.triggerScript.interactable = false;
                 yield return null;
             }
-            DawnMoonNetworker.Instance.CheckReadyAndUpdateUI(); //retrigger DawnLib to check if it needs to lock/unlock
+            DawnMoonNetworker.Instance?.CheckReadyAndUpdateUI(); //retrigger DawnLib to check if it needs to lock/unlock
         }
     }
 }
