@@ -30,35 +30,22 @@ namespace MaterialAssetRestorerCore
             // if a prefabToSearch is provided, try to find the material in that prefab first
             if (!string.IsNullOrEmpty(prefabToSearch))
             {
-                GameObject prefab = null;
                 GameObject[] objects = Resources.FindObjectsOfTypeAll<GameObject>();
-                foreach (GameObject obj in objects)
+                foreach (GameObject prefab in objects)
                 {
-                    if (obj.name == prefabToSearch)
+                    if (prefab.name == prefabToSearch)
                     {
-                        prefab = obj;
-                        break;
-                    }
-                }
-
-                if (prefab == null)
-                {
-                    MaterialAssetRestorerCore.Logger.LogWarning($"Prefab '{prefabToSearch}' not found.");
-                    onComplete?.Invoke(null);
-                    yield break;
-                }
-                else
-                {
-                    MaterialAssetRestorerCore.Logger.LogDebug($"Found prefab '{prefabToSearch}'.");
-                    Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>(true);
-                    foreach (Renderer renderer in renderers)
-                    {
-                        if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind)
-                        {
-                            MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in prefab '{prefabToSearch}'.");
-                            materialToReturn= renderer.sharedMaterial;
-                            break;
+                        MaterialAssetRestorerCore.Logger.LogDebug($"Found a prefab '{prefabToSearch}'.");
+                        foreach (Renderer renderer in prefab.GetComponentsInChildren<Renderer>(true))
+                        { 
+                            if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind && renderer.sharedMaterial.shader.name != "Hidden/InternalErrorShader") //if mods add prefabs of the same name (like Wesley's CaveWaterTile being named same as vanilla's CaveWaterTile), ensure we get the non-broken one.
+                            {
+                                MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in prefab '{prefabToSearch}'.");
+                                materialToReturn= renderer.sharedMaterial;
+                                break;
+                            }
                         }
+                        if (materialToReturn != null){break;} //only stop checking prefabs after matierial is found as there may be multiple prefabs with the same name
                     }
                 }
             }
