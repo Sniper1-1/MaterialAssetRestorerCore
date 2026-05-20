@@ -16,7 +16,7 @@ namespace MaterialAssetRestorerCore
         internal new static ManualLogSource Logger { get; private set; } = null!;
         internal static Harmony? Harmony { get; set; }
 
-        // used for locking the lever pull dependon on if LethalLevelLoader or DawnLib is installed (prevent attempts to land before materials retrieved)
+        // used for locking the lever pull depend on if LethalLevelLoader or DawnLib is installed (prevent attempts to land before materials retrieved)
         public static bool hasLLL=false;
         public static bool hasDL=false;
 
