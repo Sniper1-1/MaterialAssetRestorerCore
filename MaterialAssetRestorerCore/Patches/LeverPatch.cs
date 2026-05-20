@@ -31,13 +31,14 @@ namespace MaterialAssetRestorerCore
     [HarmonyPatch]
     internal static class DawnLibLeverPatch
     {
-        public static MethodBase TargetMethod()
+        [HarmonyTargetMethod]
+        public static MethodBase FindUnlockLever()
         {
             try
             {
                 var allNested = typeof(DawnMoonNetworker).GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Instance);
 
-                var stateMachineType = allNested.FirstOrDefault(t => t.Name.Contains("UnlockLever"));
+                var stateMachineType = allNested.FirstOrDefault(t => t.Name.Contains("UnlockLever")); //get UnlockLever from DawnLib's DawnMoonNetworker
                 if (stateMachineType == null)
                 {
                     MaterialAssetRestorerCore.Logger.LogError("Could not find UnlockLever state machine type!");
@@ -45,7 +46,7 @@ namespace MaterialAssetRestorerCore
                 }
 
                 MaterialAssetRestorerCore.Logger.LogInfo($"Found the UnlockLever");
-                return stateMachineType.GetMethod("MoveNext", BindingFlags.NonPublic | BindingFlags.Instance);
+                return stateMachineType.GetMethod("MoveNext", BindingFlags.NonPublic | BindingFlags.Instance); //get MoveNext from the UnlockLever state machine, which is where the WaitUntil is
             }
             catch (Exception ex)
             {
@@ -57,18 +58,20 @@ namespace MaterialAssetRestorerCore
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> InjectWaitInstruction(IEnumerable<CodeInstruction> instructions)
         {
-            var waitUntilConstructor = typeof(WaitUntil).GetConstructor(new[] { typeof(Func<bool>) });
+            var waitUntilConstructor = typeof(WaitUntil).GetConstructor(new[] { typeof(Func<bool>) }); //get the constructor for WaitUntil call
+            bool foundWaitUntil = false;
 
             foreach (var instruction in instructions)
             {
-                if (instruction.opcode == OpCodes.Newobj && instruction.operand as ConstructorInfo == waitUntilConstructor)
+                if (instruction.opcode == OpCodes.Newobj && instruction.operand as ConstructorInfo == waitUntilConstructor) //if the current instruction is the constructor for WaitUntil, inject own check for materialsInitialized
                 {
                     MaterialAssetRestorerCore.Logger.LogInfo("Found WaitUntil in original UnlockLever(), injecting wait for materials.");
+                    foundWaitUntil = true;
                     yield return new CodeInstruction(OpCodes.Call, typeof(DawnLibLeverPatch).GetMethod(nameof(WaitForMaterials), BindingFlags.Static | BindingFlags.Public));
                 }
-                yield return instruction;
+                yield return instruction; //keeps original instructions, including the original WaitUntil
             }
-            MaterialAssetRestorerCore.Logger.LogWarning("Never found WaitUntil constructor in MoveNext!");
+            if(!foundWaitUntil){ MaterialAssetRestorerCore.Logger.LogWarning("Never found WaitUntil constructor in MoveNext!"); }
         }
 
         public static Func<bool> WaitForMaterials(Func<bool> original)
