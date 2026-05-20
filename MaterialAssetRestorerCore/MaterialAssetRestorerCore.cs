@@ -85,7 +85,7 @@ namespace MaterialAssetRestorerCore
                 try
                 {
                     Harmony.PatchAll(typeof(DawnLibLeverPatch));
-                    MaterialAssetRestorerCore.Logger.LogInfo("DawnLib detected, patching CheckReadyAndUpdateUI()");
+                    MaterialAssetRestorerCore.Logger.LogInfo("DawnLib detected, patching DawnMoonNetworker.UnlockLever()");
                     hasDL = true;
                 }
                 catch
