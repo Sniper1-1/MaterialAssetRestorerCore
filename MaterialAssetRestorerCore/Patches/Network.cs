@@ -9,7 +9,7 @@ namespace MaterialAssetRestorerCore
     // Creates a network prefab, which prevents joining between those with and without the mod. I'm not sure it's really needed for this mod,
     // but I worry that someone could use it to maybe give certain walls a clear material or scrap a brighter one. idk, I feel like there could be cheating
     [HarmonyPatch(typeof(NetworkManager))]
-    internal static class NetworkPrefabPatch1
+    internal static class MARCNetworkPrefabPatch
     {
         private static readonly string MOD_GUID = MyPluginInfo.PLUGIN_GUID;
 
@@ -17,6 +17,8 @@ namespace MaterialAssetRestorerCore
         [HarmonyPatch(nameof(NetworkManager.SetSingleton))]
         private static void RegisterPrefab()
         {
+            MaterialAssetRestorerCore.Logger.LogInfo("Registering network prefab for M.A.R.C....");
+
             var prefab = new GameObject(MOD_GUID + " Prefab");
             prefab.hideFlags |= HideFlags.HideAndDontSave;
             Object.DontDestroyOnLoad(prefab);
@@ -43,6 +45,7 @@ namespace MaterialAssetRestorerCore
         public override void OnNetworkSpawn()
         {
             Instance = this;
+            MaterialAssetRestorerCore.Logger.LogInfo($"MARCNetworker spawned on client {NetworkManager.Singleton.LocalClientId}");
         }
 
         [ServerRpc(RequireOwnership = false)]

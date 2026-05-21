@@ -40,6 +40,7 @@ namespace MaterialAssetRestorerCore
 
             Harmony.PatchAll(typeof(MaterialInit));
             Harmony.PatchAll(typeof(WaterSwap));
+            Harmony.PatchAll(typeof(MARCNetworker));
             JSONManager.ReadJSONFiles();
             PatchLever();
 
