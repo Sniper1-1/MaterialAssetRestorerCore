@@ -17,6 +17,7 @@ namespace MaterialAssetRestorerCore
         [HarmonyPatch(typeof(LethalLevelLoader.Patches), nameof(LethalLevelLoader.Patches.CheckLever)), HarmonyPrefix]
         public static bool LeverPatch(InteractTrigger trigger)
         {
+            MaterialAssetRestorerCore.Logger.LogWarning("Lever enabled: " + MaterialInit.materialsInitialized);
             if (!MaterialInit.materialsInitialized)
             {
                 trigger.disabledHoverTip = "[ M.A.R.C. still caching materials!]";
