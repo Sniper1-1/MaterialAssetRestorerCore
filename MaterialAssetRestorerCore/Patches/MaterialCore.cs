@@ -22,7 +22,7 @@ namespace MaterialAssetRestorerCore
         }
         public static IEnumerator InitializeMaterialsCoroutine()
         {
-            materialsInitialized = false;
+            MARCNetworker.Instance.SetMaterialsInitializedServerRpc(false);
             MaterialAssetRestorerCore.Logger.LogInfo("Initializing materials...");
             foreach (MaterialInformationContainer container in materialInformationContainers)
             {
@@ -36,7 +36,7 @@ namespace MaterialAssetRestorerCore
             }
             yield return new WaitForSeconds(10); //debug testing. REMOVE THIS
             MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
-            materialsInitialized = true;
+            MARCNetworker.Instance.SetMaterialsInitializedServerRpc(true);
         }
     }
 
