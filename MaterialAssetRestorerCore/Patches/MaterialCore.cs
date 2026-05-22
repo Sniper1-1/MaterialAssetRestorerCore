@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DunGen;
 using HarmonyLib;
+using Unity.Netcode;
 using UnityEngine;
 
 
@@ -11,7 +12,7 @@ namespace MaterialAssetRestorerCore
     public class MaterialInit
     {
         public static List<MaterialInformationContainer> materialInformationContainers = new List<MaterialInformationContainer>();
-        public static bool materialsInitialized = false;
+        public static NetworkVariable<bool> materialsInitialized = new NetworkVariable<bool>(false);
 
         //after StartOfRound, initialize the materials
         [HarmonyPostfix]
@@ -22,7 +23,7 @@ namespace MaterialAssetRestorerCore
         }
         public static IEnumerator InitializeMaterialsCoroutine()
         {
-            materialsInitialized = false;
+            NetworkBool.SetBoolServerRpc(false);
             MaterialAssetRestorerCore.Logger.LogInfo("Initializing materials...");
             foreach (MaterialInformationContainer container in materialInformationContainers)
             {
@@ -36,7 +37,7 @@ namespace MaterialAssetRestorerCore
             }
             yield return new WaitForSeconds(10); //debug testing. REMOVE THIS
             MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
-            materialsInitialized = true;
+            NetworkBool.SetBoolServerRpc(true);
         }
     }
 

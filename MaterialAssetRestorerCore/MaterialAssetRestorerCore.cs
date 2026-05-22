@@ -26,6 +26,7 @@ namespace MaterialAssetRestorerCore
             Instance = this;
 
             NetcodePatcher();
+            NetworkBool.Init();
             Patch();
 
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");
@@ -40,6 +41,7 @@ namespace MaterialAssetRestorerCore
 
             Harmony.PatchAll(typeof(MaterialInit));
             Harmony.PatchAll(typeof(WaterSwap));
+            Harmony.PatchAll(typeof(MARCNetworkPrefabPatch));
             JSONManager.ReadJSONFiles();
             PatchLever();
 
