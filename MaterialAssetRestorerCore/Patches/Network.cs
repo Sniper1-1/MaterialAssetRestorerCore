@@ -37,6 +37,11 @@ namespace MaterialAssetRestorerCore
     internal class NetworkBool: NetworkBehaviour
     {
         public static NetworkBool Instance { get; internal set; }
+        public override void OnNetworkSpawn()
+        {
+            Instance = this;
+        }
+
         public static NetworkVariable<bool> materialsInitialized = new NetworkVariable<bool>(false);
         internal static void Init()
         {
