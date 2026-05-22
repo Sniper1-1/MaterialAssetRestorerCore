@@ -12,7 +12,6 @@ namespace MaterialAssetRestorerCore
     public class MaterialInit
     {
         public static List<MaterialInformationContainer> materialInformationContainers = new List<MaterialInformationContainer>();
-        public static NetworkVariable<bool> materialsInitialized = new NetworkVariable<bool>(false);
 
         //after StartOfRound, initialize the materials
         [HarmonyPostfix]
@@ -23,7 +22,7 @@ namespace MaterialAssetRestorerCore
         }
         public static IEnumerator InitializeMaterialsCoroutine()
         {
-            NetworkBool.SetBoolServerRpc(false);
+            NetworkBool.Instance?.SetBoolServerRpc(false);
             MaterialAssetRestorerCore.Logger.LogInfo("Initializing materials...");
             foreach (MaterialInformationContainer container in materialInformationContainers)
             {
@@ -37,7 +36,7 @@ namespace MaterialAssetRestorerCore
             }
             yield return new WaitForSeconds(10); //debug testing. REMOVE THIS
             MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
-            NetworkBool.SetBoolServerRpc(true);
+            NetworkBool.Instance?.SetBoolServerRpc(true);
         }
     }
 

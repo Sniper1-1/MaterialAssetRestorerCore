@@ -22,6 +22,7 @@ namespace MaterialAssetRestorerCore
             Object.DontDestroyOnLoad(prefab);
             var networkObject = prefab.AddComponent<NetworkObject>();
             networkObject.GlobalObjectIdHash = GetHash(MOD_GUID);
+            prefab.AddComponent<NetworkBool>();
 
             NetworkManager.Singleton.PrefabHandler.AddNetworkPrefab(prefab);
             return;
@@ -33,17 +34,19 @@ namespace MaterialAssetRestorerCore
         }
     }
 
-    internal static class NetworkBool
+    internal class NetworkBool: NetworkBehaviour
     {
+        public static NetworkBool Instance { get; internal set; }
+        public static NetworkVariable<bool> materialsInitialized = new NetworkVariable<bool>(false);
         internal static void Init()
         {
             NetworkVariableSerializationTypes.InitializeSerializer_UnmanagedByMemcpy<bool>();
             NetworkVariableSerializationTypes.InitializeEqualityChecker_UnmanagedIEquatable<bool>();
         }
-        [ServerRpc(RequireOwnership = false)]
-        public static void SetBoolServerRpc(bool value)
+        [Rpc(SendTo.ClientsAndHost)]
+        public void SetBoolServerRpc(bool value)
         {
-            MaterialInit.materialsInitialized.Value = value;
+            materialsInitialized.Value = value;
         }
     }
 }
