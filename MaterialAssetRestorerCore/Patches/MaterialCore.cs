@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using DunGen;
 using HarmonyLib;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -95,8 +94,8 @@ namespace MaterialAssetRestorerCore
         }
         public static void UnmuteSceneStateChangeEvents()
         {
-            MaterialAssetRestorerCore.Harmony?.Unpatch(typeof(SceneLoadPatches).GetMethod(nameof(MuteSceneLoadedEventTrigger)), HarmonyPatchType.Prefix, MaterialAssetRestorerCore.Harmony.Id);
-            MaterialAssetRestorerCore.Harmony?.Unpatch(typeof(SceneLoadPatches).GetMethod(nameof(MuteSceneUnloadedEventTrigger)), HarmonyPatchType.Prefix, MaterialAssetRestorerCore.Harmony.Id);
+            MaterialAssetRestorerCore.Harmony?.Unpatch(AccessTools.Method(typeof(SceneManager), "Internal_SceneLoaded"), HarmonyPatchType.All, MaterialAssetRestorerCore.Harmony.Id);
+            MaterialAssetRestorerCore.Harmony?.Unpatch(AccessTools.Method(typeof(SceneManager), "Internal_SceneUnloaded"), HarmonyPatchType.All, MaterialAssetRestorerCore.Harmony.Id);
             MaterialAssetRestorerCore.Logger.LogDebug("Re-enabled scene load/unload events.");
         }
         [HarmonyPrefix]
