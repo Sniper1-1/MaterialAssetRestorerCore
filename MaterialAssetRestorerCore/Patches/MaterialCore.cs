@@ -4,6 +4,7 @@ using DunGen;
 using HarmonyLib;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 namespace MaterialAssetRestorerCore
@@ -23,6 +24,7 @@ namespace MaterialAssetRestorerCore
         public static IEnumerator InitializeMaterialsCoroutine()
         {
             MaterialsNetworkSync.materialsInitialized.Value = false;
+            SceneLoadPatches.MuteSceneStateChangeEvents(); //prevent other mods from running code on scene load/unload
             MaterialAssetRestorerCore.Logger.LogInfo("Initializing materials...");
             foreach (MaterialInformationContainer container in materialInformationContainers)
             {
@@ -35,6 +37,7 @@ namespace MaterialAssetRestorerCore
                 });
             }
             yield return new WaitForSeconds(10); //debug testing. REMOVE THIS
+            SceneLoadPatches.UnmuteSceneStateChangeEvents(); //allow other mods to run code on scene load/unload again
             MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
             MaterialsNetworkSync.materialsInitialized.Value = true;
         }
@@ -79,5 +82,36 @@ namespace MaterialAssetRestorerCore
         public string PrefabName = null;
         public string SceneName = null;
         public Material replacementMaterial = null;
+    }
+
+    //patch scene load/unload to prevent other mods from running things if they are subscribed to these events
+    [HarmonyPatch(typeof(SceneManager))]
+    public class SceneLoadPatches
+    {
+        public static void MuteSceneStateChangeEvents()
+        {
+            MaterialAssetRestorerCore.Harmony?.PatchAll(typeof(SceneLoadPatches)); //patch scene load/unload to prevent other mods from running things if they are subscribed to these events
+            MaterialAssetRestorerCore.Logger.LogDebug("Suppressed scene load/unload events from triggering.");
+        }
+        public static void UnmuteSceneStateChangeEvents()
+        {
+            MaterialAssetRestorerCore.Harmony?.Unpatch(typeof(SceneLoadPatches).GetMethod(nameof(MuteSceneLoadedEventTrigger)), HarmonyPatchType.Prefix, MaterialAssetRestorerCore.Harmony.Id);
+            MaterialAssetRestorerCore.Harmony?.Unpatch(typeof(SceneLoadPatches).GetMethod(nameof(MuteSceneUnloadedEventTrigger)), HarmonyPatchType.Prefix, MaterialAssetRestorerCore.Harmony.Id);
+            MaterialAssetRestorerCore.Logger.LogDebug("Re-enabled scene load/unload events.");
+        }
+        [HarmonyPrefix]
+        [HarmonyPriority(800)] //make sure this runs before other potential patches
+        [HarmonyPatch(nameof(SceneManager.Internal_SceneLoaded))]
+        public static bool MuteSceneLoadedEventTrigger()
+        {
+            return false;
+        }
+        [HarmonyPrefix]
+        [HarmonyPriority(800)] //make sure this runs before other potential patches
+        [HarmonyPatch(nameof(SceneManager.Internal_SceneUnloaded))]
+        public static bool MuteSceneUnloadedEventTrigger()
+        {
+            return false;
+        }
     }
 }
