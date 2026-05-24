@@ -22,7 +22,7 @@ namespace MaterialAssetRestorerCore
         }
         public static IEnumerator InitializeMaterialsCoroutine()
         {
-            NetworkBool.Instance?.SetBoolServerRpc(false);
+            MaterialsNetworkSync.materialsInitialized.Value = false;
             MaterialAssetRestorerCore.Logger.LogInfo("Initializing materials...");
             foreach (MaterialInformationContainer container in materialInformationContainers)
             {
@@ -36,7 +36,7 @@ namespace MaterialAssetRestorerCore
             }
             yield return new WaitForSeconds(10); //debug testing. REMOVE THIS
             MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
-            NetworkBool.Instance?.SetBoolServerRpc(true);
+            MaterialsNetworkSync.materialsInitialized.Value = true;
         }
     }
 
