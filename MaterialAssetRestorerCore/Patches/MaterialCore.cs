@@ -46,13 +46,14 @@ namespace MaterialAssetRestorerCore
     public class WaterSwap
     {
         [HarmonyPostfix]
-        public static void SwapWaterMaterials()
+        public static void SwapWaterMaterials(RoundManager __instance)
         {
+            Scene sceneToReplace = SceneManager.GetSceneByName(__instance.currentLevel.sceneName); //get the newly loaded moon scene (no need to search SampleSceneRelay's renders to replace)
             foreach (MaterialInformationContainer container in MaterialInit.materialInformationContainers)
             {
                 if (container.replacementMaterial != null)
                 {
-                    MaterialSet.SET_material(container.ReplaceMaterial, container.replacementMaterial);
+                    MaterialSet.SET_material(container.ReplaceMaterial, container.replacementMaterial, sceneToReplace);
                 }
             }
         }

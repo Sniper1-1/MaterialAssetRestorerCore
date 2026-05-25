@@ -71,15 +71,19 @@ namespace MaterialAssetRestorerCore
                 }
 
                 //find materials
-                var renderers = GameObject.FindObjectsOfType<Renderer>(true);
-                foreach (var renderer in renderers)
+                GameObject[] gameObjects = scene.GetRootGameObjects(); //only search the specified scene, avoiding searching SampleSceneRelay that's always loaded (unless it is the target scene of course)
+                foreach (GameObject gameObject in gameObjects) 
                 {
-                    if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind)
+                    foreach (Renderer renderer in gameObject.GetComponentsInChildren<Renderer>(true))
                     {
-                        MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in {sceneToSearch}.");
-                        materialToReturn = renderer.sharedMaterial;
-                        break;
+                        if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind)
+                        {
+                            MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in {sceneToSearch}.");
+                            materialToReturn = renderer.sharedMaterial;
+                            break;
+                        }
                     }
+                    if (materialToReturn != null){break; } //stop checking gameobjects after material is found
                 }
 
                 //unload scene (never SampleSceneRelay though)

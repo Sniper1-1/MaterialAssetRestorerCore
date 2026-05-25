@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MaterialAssetRestorerCore
 {
@@ -9,24 +10,28 @@ namespace MaterialAssetRestorerCore
         /// </summary>
         /// <param name="original">The original material name.</param>
         /// <param name="replacement">The replacement material.</param>
-        public static void SET_material(string original, Material replacement)
+        /// <param name="sceneToReplace">The scene to perform the replacement in.</param>
+        public static void SET_material(string original, Material replacement, Scene sceneToReplace)
         {
-            foreach (var renderer in GameObject.FindObjectsOfType<Renderer>())
+            foreach (GameObject rootObj in sceneToReplace.GetRootGameObjects())
             {
-                var sharedMaterials = renderer.sharedMaterials;
-                bool changed = false;
-                for (int i = 0; i < sharedMaterials.Length; i++)
+                foreach (var renderer in rootObj.GetComponentsInChildren<Renderer>(true))
                 {
-                    if (sharedMaterials[i] != null && sharedMaterials[i].name == original)
+                    var sharedMaterials = renderer.sharedMaterials;
+                    bool changed = false;
+                    for (int i = 0; i < sharedMaterials.Length; i++)
                     {
-                        sharedMaterials[i] = replacement;
-                        changed = true;
-                        MaterialAssetRestorerCore.Logger.LogInfo($"Replaced material '{original}' with '{replacement.name}' in renderer '{renderer.gameObject.name}'.");
+                        if (sharedMaterials[i] != null && sharedMaterials[i].name == original)
+                        {
+                            sharedMaterials[i] = replacement;
+                            changed = true;
+                            MaterialAssetRestorerCore.Logger.LogInfo($"Replaced material '{original}' with '{replacement.name}' in renderer '{renderer.gameObject.name}' in scene '{sceneToReplace.name}'.");
+                        }
                     }
-                }
-                if (changed)
-                {
-                    renderer.sharedMaterials = sharedMaterials;
+                    if (changed)
+                    {
+                        renderer.sharedMaterials = sharedMaterials;
+                    }
                 }
             }
         }
