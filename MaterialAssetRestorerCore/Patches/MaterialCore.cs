@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 namespace MaterialAssetRestorerCore
 {
+    // runs on player connect to lobby to kick off caching the desired materials
     [HarmonyPatch(typeof(StartOfRound))]
     public class MaterialInit
     {
@@ -42,6 +43,7 @@ namespace MaterialAssetRestorerCore
         }
     }
 
+    // runs after a new moon fully loads to swap the broken materials for the ones we cached at the start of the round
     [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.FinishGeneratingNewLevelClientRpc))]
     public class WaterSwap
     {
