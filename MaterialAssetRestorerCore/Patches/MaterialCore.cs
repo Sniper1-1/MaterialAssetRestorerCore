@@ -90,11 +90,17 @@ namespace MaterialAssetRestorerCore
     [HarmonyPatch(typeof(SceneManager))]
     public class SceneLoadPatches
     {
+        /// <summary>
+        /// applies patches to scene load/unload to prevent other mods from running things if they are subscribed to these events
+        /// </summary>
         public static void MuteSceneStateChangeEvents()
         {
-            MaterialAssetRestorerCore.Harmony?.PatchAll(typeof(SceneLoadPatches)); //patch scene load/unload to prevent other mods from running things if they are subscribed to these events
+            MaterialAssetRestorerCore.Harmony?.PatchAll(typeof(SceneLoadPatches)); 
             MaterialAssetRestorerCore.Logger.LogDebug("Suppressed scene load/unload events from triggering.");
         }
+        /// <summary>
+        /// removes patches to scene load/unload to allow other mods to run things if they are subscribed to these events again
+        /// </summary>
         public static void UnmuteSceneStateChangeEvents()
         {
             MaterialAssetRestorerCore.Harmony?.Unpatch(AccessTools.Method(typeof(SceneManager), "Internal_SceneLoaded"), HarmonyPatchType.All, MaterialAssetRestorerCore.Harmony.Id);
