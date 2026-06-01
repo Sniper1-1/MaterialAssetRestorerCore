@@ -20,16 +20,12 @@ namespace MaterialAssetRestorerCore
         [HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.Start))]
         public static void WaitForNetworkVariables()
         {
+            MaterialAssetRestorerCore.Logger.LogDebug("Waiting for network variables to initialize before starting material caching...");
             MaterialsNetworkSync.waitingPlayerCount.OnInitialized += InitializeMaterialsPatch;
-            MaterialsNetworkSync.materialsInitialized.OnInitialized += InitializeMaterialsPatch;
         }
         public static void InitializeMaterialsPatch()
         {
-            MaterialAssetRestorerCore.Logger.LogDebug($"Materials Initialized: {MaterialsNetworkSync.materialsInitialized.IsInitialized}, Waiting Player Count Initialized: {MaterialsNetworkSync.waitingPlayerCount.IsInitialized}");
-            if (MaterialsNetworkSync.materialsInitialized.IsInitialized && MaterialsNetworkSync.waitingPlayerCount.IsInitialized)
-            { 
-                CoroutineHelper.Instance.StartCoroutine(MaterialInit.InitializeMaterialsCoroutine()); 
-            }
+            CoroutineHelper.Instance.StartCoroutine(MaterialInit.InitializeMaterialsCoroutine()); 
         }
         public static IEnumerator InitializeMaterialsCoroutine()
         {
