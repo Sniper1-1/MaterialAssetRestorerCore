@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DunGen;
 using HarmonyLib;
+using LethalNetworkAPI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,13 +18,22 @@ namespace MaterialAssetRestorerCore
         //after StartOfRound, initialize the materials
         [HarmonyPostfix]
         [HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.Start))]
+        public static void WaitForNetworkVariables()
+        {
+            MaterialsNetworkSync.waitingPlayerCount.OnInitialized += InitializeMaterialsPatch;
+            MaterialsNetworkSync.materialsInitialized.OnInitialized += InitializeMaterialsPatch;
+        }
         public static void InitializeMaterialsPatch()
         {
-            CoroutineHelper.Instance.StartCoroutine(MaterialInit.InitializeMaterialsCoroutine());
+            MaterialAssetRestorerCore.Logger.LogDebug($"Materials Initialized: {MaterialsNetworkSync.materialsInitialized.IsInitialized}, Waiting Player Count Initialized: {MaterialsNetworkSync.waitingPlayerCount.IsInitialized}");
+            if (MaterialsNetworkSync.materialsInitialized.IsInitialized && MaterialsNetworkSync.waitingPlayerCount.IsInitialized)
+            { 
+                CoroutineHelper.Instance.StartCoroutine(MaterialInit.InitializeMaterialsCoroutine()); 
+            }
         }
         public static IEnumerator InitializeMaterialsCoroutine()
         {
-            MaterialsNetworkSync.materialsInitialized.Value = false;
+            MaterialsNetworkSync.waitingPlayerCount.Value++;
             SceneLoadPatches.MuteSceneStateChangeEvents(); //prevent other mods from running code on scene load/unload
             MaterialAssetRestorerCore.Logger.LogInfo("Initializing materials...");
             foreach (MaterialInformationContainer container in materialInformationContainers)
@@ -39,7 +49,7 @@ namespace MaterialAssetRestorerCore
             yield return new WaitForSeconds(10); //debug testing. REMOVE THIS
             SceneLoadPatches.UnmuteSceneStateChangeEvents(); //allow other mods to run code on scene load/unload again
             MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
-            MaterialsNetworkSync.materialsInitialized.Value = true;
+            MaterialsNetworkSync.waitingPlayerCount.Value--;
         }
     }
 
