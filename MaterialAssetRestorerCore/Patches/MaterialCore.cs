@@ -18,17 +18,16 @@ namespace MaterialAssetRestorerCore
         //after StartOfRound, initialize the materials
         [HarmonyPostfix]
         [HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.Start))]
-        public static void WaitForNetworkVariables()
-        {
-            MaterialAssetRestorerCore.Logger.LogDebug("Waiting for network variables to initialize before starting material caching...");
-            MaterialsNetworkSync.waitingPlayerCount.OnInitialized += InitializeMaterialsPatch;
-        }
         public static void InitializeMaterialsPatch()
         {
             CoroutineHelper.Instance.StartCoroutine(MaterialInit.InitializeMaterialsCoroutine()); 
         }
         public static IEnumerator InitializeMaterialsCoroutine()
         {
+            if (!MaterialsNetworkSync.waitingPlayerCount.IsInitialized)
+            {
+                yield return new WaitUntil(() => MaterialsNetworkSync.waitingPlayerCount.IsInitialized); //wait until waitingPlayerCount is initialized before trying to use it (mainly for joining players as it is initialized for host player when save selected)
+            }
             MaterialsNetworkSync.waitingPlayerCount.Value++;
             SceneLoadPatches.MuteSceneStateChangeEvents(); //prevent other mods from running code on scene load/unload
             MaterialAssetRestorerCore.Logger.LogInfo("Initializing materials...");
@@ -42,7 +41,7 @@ namespace MaterialAssetRestorerCore
                     }
                 });
             }
-            yield return new WaitForSeconds(10); //debug testing. REMOVE THIS
+            yield return new WaitForSeconds(60); //debug testing. REMOVE THIS
             SceneLoadPatches.UnmuteSceneStateChangeEvents(); //allow other mods to run code on scene load/unload again
             MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
             MaterialsNetworkSync.waitingPlayerCount.Value--;
