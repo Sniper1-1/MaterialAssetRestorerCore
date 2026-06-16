@@ -35,15 +35,7 @@ namespace MaterialAssetRestorerCore
                     if (prefab.name == prefabToSearch)
                     {
                         MaterialAssetRestorerCore.Logger.LogDebug($"Found a prefab '{prefabToSearch}'.");
-                        foreach (Renderer renderer in prefab.GetComponentsInChildren<Renderer>(true))
-                        { 
-                            if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind && renderer.sharedMaterial.shader.name != "Hidden/InternalErrorShader") //if mods add prefabs of the same name (like Wesley's CaveWaterTile being named same as vanilla's CaveWaterTile), ensure we get the non-broken one.
-                            {
-                                MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in prefab '{prefabToSearch}'.");
-                                materialToReturn= renderer.sharedMaterial;
-                                break;
-                            }
-                        }
+                        materialToReturn = GetFromRenderers(prefab, materialToFind);
                         if (materialToReturn != null){break;} //only stop checking prefabs after matierial is found as there may be multiple prefabs with the same name
                     }
                 }
@@ -73,15 +65,7 @@ namespace MaterialAssetRestorerCore
                 GameObject[] gameObjects = scene.GetRootGameObjects(); //only search the specified scene, avoiding searching SampleSceneRelay that's always loaded (unless it is the target scene of course)
                 foreach (GameObject gameObject in gameObjects) 
                 {
-                    foreach (Renderer renderer in gameObject.GetComponentsInChildren<Renderer>(true))
-                    {
-                        if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind)
-                        {
-                            MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in {sceneToSearch}.");
-                            materialToReturn = renderer.sharedMaterial;
-                            break;
-                        }
-                    }
+                    materialToReturn = GetFromRenderers(gameObject, materialToFind);
                     if (materialToReturn != null){break; } //stop checking gameobjects after material is found
                 }
 
@@ -94,6 +78,25 @@ namespace MaterialAssetRestorerCore
 
             MaterialAssetRestorerCore.Logger.LogInfo($"Material '{materialToFind}' search completed. Found: {(materialToReturn != null ? "Yes" : "No")}");
             onComplete?.Invoke(materialToReturn); // send the found material back to the caller
+        }
+
+        /// <summary>
+        /// Takes a GameObject and checks all of its and its children's renderers for the material, returning it if found.
+        /// </summary>
+        /// <param name="objToSearch">The GameObject to search through (including its children).</param>
+        /// <param name="materialToFind">The name of the material to find.</param>
+        /// <returns>The found material, or null if not found.</returns>
+        private static Material GetFromRenderers(GameObject objToSearch, string materialToFind)
+        {
+            foreach (Renderer renderer in objToSearch.GetComponentsInChildren<Renderer>(true))
+            {
+                if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind && renderer.sharedMaterial.shader.name != "Hidden/InternalErrorShader") //if mods add prefabs of the same name (like Wesley's CaveWaterTile being named same as vanilla's CaveWaterTile), ensure we get the non-broken one.
+                {
+                    MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in prefab '{objToSearch}'.");
+                    return renderer.sharedMaterial;
+                }
+            }
+            return null;
         }
     }
 }
