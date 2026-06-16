@@ -24,7 +24,5 @@ namespace MaterialAssetRestorerCore
                 MaterialAssetRestorerCore.Logger.LogDebug("Wrong lever!");
             }
         }
-
-        public static void printDebug() { MaterialAssetRestorerCore.Logger.LogDebug("\n\n###############\nwaitingPlayerCount initialized\n###############\n"); }
     }
 }
