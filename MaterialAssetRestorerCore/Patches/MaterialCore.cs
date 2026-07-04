@@ -17,7 +17,7 @@ namespace MaterialAssetRestorerCore
 
         //after StartOfRound, initialize the materials
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.Start))]
+        [HarmonyPatch(typeof(StartMatchLever), nameof(StartMatchLever.Start))]
         public static void InitializeMaterialsPatch()
         {
             CoroutineHelper.Instance.StartCoroutine(MaterialInit.InitializeMaterialsCoroutine()); 
