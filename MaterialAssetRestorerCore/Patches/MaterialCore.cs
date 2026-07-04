@@ -10,12 +10,12 @@ using UnityEngine.SceneManagement;
 namespace MaterialAssetRestorerCore
 {
     // runs on player connect to lobby to kick off caching the desired materials
-    [HarmonyPatch(typeof(StartOfRound))]
+    [HarmonyPatch(typeof(StartMatchLever))]
     public class MaterialInit
     {
         public static List<MaterialInformationContainer> materialInformationContainers = new List<MaterialInformationContainer>();
 
-        //after StartOfRound, initialize the materials
+        //after StartMatchLever's Start method, initialize the materials
         [HarmonyPostfix]
         [HarmonyPatch(typeof(StartMatchLever), nameof(StartMatchLever.Start))]
         public static void InitializeMaterialsPatch()
