@@ -35,10 +35,12 @@ namespace MaterialAssetRestorerCore
 
             Logger.LogDebug("Patching...");
 
-            Harmony.PatchAll(typeof(MaterialInit));
-            Harmony.PatchAll(typeof(WaterSwap));
+            //Harmony.PatchAll(typeof(MaterialInit));
+            //Harmony.PatchAll(typeof(WaterSwap));
+            //Harmony.PatchAll(typeof(LeverPatchClass));
+            Harmony.PatchAll();
             JSONManager.ReadJSONFiles();
-            PatchLever();
+            //PatchLever();
 
             Logger.LogDebug("Finished patching!");
         }
@@ -52,29 +54,29 @@ namespace MaterialAssetRestorerCore
             Logger.LogDebug("Finished unpatching!");
         }
 
-        private static void PatchLever()
-        {
-            try
-            {
-                Harmony.PatchAll(typeof(LLLLeverPatch));
-                MaterialAssetRestorerCore.Logger.LogInfo("LethalLevelLoader detected, patching CheckLever()");
-                hasLLL = true;
-            }
-            catch
-            {
-                MaterialAssetRestorerCore.Logger.LogInfo("LethalLevelLoader not detected, checking for DawnLib");
-                try
-                {
-                    Harmony.PatchAll(typeof(DawnLibLeverPatch));
-                    MaterialAssetRestorerCore.Logger.LogInfo("DawnLib detected, patching DawnMoonNetworker.UnlockLever()");
-                    hasDL = true;
-                }
-                catch
-                {
-                    MaterialAssetRestorerCore.Logger.LogWarning("DawnLib not detected either. What would you possible be using this for?");
-                }
+        //private static void PatchLever()
+        //{
+        //    try
+        //    {
+        //        Harmony.PatchAll(typeof(LLLLeverPatch));
+        //        MaterialAssetRestorerCore.Logger.LogInfo("LethalLevelLoader detected, patching CheckLever()");
+        //        hasLLL = true;
+        //    }
+        //    catch
+        //    {
+        //        MaterialAssetRestorerCore.Logger.LogInfo("LethalLevelLoader not detected, checking for DawnLib");
+        //        try
+        //        {
+        //            Harmony.PatchAll(typeof(DawnLibLeverPatch));
+        //            MaterialAssetRestorerCore.Logger.LogInfo("DawnLib detected, patching DawnMoonNetworker.UnlockLever()");
+        //            hasDL = true;
+        //        }
+        //        catch
+        //        {
+        //            MaterialAssetRestorerCore.Logger.LogWarning("DawnLib not detected either. What would you possible be using this for?");
+        //        }
 
-            }
-        }
+        //    }
+        //}
     }
 }

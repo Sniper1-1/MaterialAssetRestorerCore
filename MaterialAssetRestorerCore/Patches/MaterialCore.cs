@@ -41,7 +41,7 @@ namespace MaterialAssetRestorerCore
                     }
                 });
             }
-            yield return new WaitForSeconds(60); //debug testing. REMOVE THIS
+            yield return new WaitForSeconds(20); //debug testing. REMOVE THIS
             SceneLoadPatches.UnmuteSceneStateChangeEvents(); //allow other mods to run code on scene load/unload again
             MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
             MaterialsNetworkSync.waitingPlayerCount.Value--;
