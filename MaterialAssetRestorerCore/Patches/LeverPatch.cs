@@ -9,22 +9,25 @@ using UnityEngine;
 
 namespace MaterialAssetRestorerCore
 {
-    internal static class LLLLeverPatch
-    {
-        ////runs before LLL does its check for if the lever should be locked/unlocked. Once I'm done, LLL can do its checks
-        //[HarmonyPatch(typeof(LethalLevelLoader.Patches), nameof(LethalLevelLoader.Patches.CheckLever)), HarmonyPrefix]
-        //public static bool LeverPatch(InteractTrigger trigger)
-        //{
-        //    MaterialAssetRestorerCore.Logger.LogWarning($"Lever enabled: {MaterialsNetworkSync.waitingPlayerCount.Value <= 0}");
-        //    if (MaterialsNetworkSync.waitingPlayerCount.Value > 0)
-        //    {
-        //        trigger.disabledHoverTip = "[ M.A.R.C. still caching materials!]";
-        //        trigger.interactable = false;
-        //        return false;
-        //    }
-        //    return true;
-        //}
-    }
+    //[HarmonyPatch]
+    //internal static class LLLLeverPatch
+    //{
+    //    private static string MARCDisabledHoverTip = "[ M.A.R.C. still caching materials! ]";
+    //    private static string PreviousDisabledHoverTip = null;
+
+    //    //runs before LLL does its check for if the lever should be locked/unlocked. Once I'm done, LLL can do its checks
+    //    [HarmonyPatch(typeof(LethalLevelLoader.Patches), nameof(LethalLevelLoader.Patches.CheckLever)), HarmonyPrefix]
+    //    public static bool LeverPatch(InteractTrigger trigger)
+    //    {
+    //        if (MaterialsNetworkSync.waitingPlayerCount.Value > 0)
+    //        {
+    //            trigger.disabledHoverTip = MARCDisabledHoverTip;
+    //            trigger.interactable = false;
+    //            return false;
+    //        }
+    //        return true;
+    //    }
+    //}
 
     //[HarmonyPatch]
     //internal static class DawnLibLeverPatch
@@ -34,7 +37,7 @@ namespace MaterialAssetRestorerCore
     //    {
     //        try
     //        {
-    //            var allNested = typeof(DawnMoonNetworker).GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Instance);
+    //            var allNested = typeof(Dawn.Internal.DawnMoonNetworker).GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Instance);
 
     //            var stateMachineType = allNested.FirstOrDefault(t => t.Name.Contains("UnlockLever")); //get UnlockLever from DawnLib's DawnMoonNetworker
     //            if (stateMachineType == null)
@@ -69,7 +72,7 @@ namespace MaterialAssetRestorerCore
     //            }
     //            yield return instruction; //keeps original instructions, including the original WaitUntil
     //        }
-    //        if(!foundWaitUntil){ MaterialAssetRestorerCore.Logger.LogWarning("Never found WaitUntil constructor in MoveNext!"); }
+    //        if (!foundWaitUntil) { MaterialAssetRestorerCore.Logger.LogWarning("Never found WaitUntil constructor in MoveNext!"); }
     //    }
 
     //    public static Func<bool> WaitForMaterials(Func<bool> original)
@@ -77,17 +80,23 @@ namespace MaterialAssetRestorerCore
     //        return () => original() && MaterialsNetworkSync.waitingPlayerCount.Value <= 0;
     //    }
     //}
+
     [HarmonyPatch]
     internal static class LeverPatchClass
     {
         private static string MARCDisabledHoverTip = "[ M.A.R.C. still caching materials! ]";
         private static string PreviousDisabledHoverTip = null;
+        private static StartOfRound startOfRoundInstance = null;
 
         [HarmonyPatch(typeof(StartMatchLever), nameof(StartMatchLever.Update)), HarmonyPostfix]
         private static void LeverPatch(StartMatchLever __instance)
         {
-            if (__instance.triggerScript.disabledHoverTip != MARCDisabledHoverTip) 
+            if (startOfRoundInstance == null) 
             { 
+                startOfRoundInstance = GameObject.FindObjectOfType<StartOfRound>();
+            }
+            if (__instance.triggerScript.disabledHoverTip != MARCDisabledHoverTip)
+            {
                 PreviousDisabledHoverTip = __instance.triggerScript.disabledHoverTip;
             }
             if (MaterialsNetworkSync.waitingPlayerCount.Value > 0)
@@ -98,12 +107,12 @@ namespace MaterialAssetRestorerCore
             else
             {
                 __instance.triggerScript.disabledHoverTip = PreviousDisabledHoverTip;
-                if (__instance.IsServer)
+                if (__instance.IsServer && startOfRoundInstance.inShipPhase)
                 {
-                    
+
                     __instance.triggerScript.interactable = true;
                 }
-                
+
             }
         }
     }
