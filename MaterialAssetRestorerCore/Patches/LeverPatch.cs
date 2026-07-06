@@ -90,6 +90,7 @@ namespace MaterialAssetRestorerCore
             }
             else
             {
+                if(__instance.IsServer)
                 __instance.triggerScript.interactable = true;
             }
         }
