@@ -80,18 +80,30 @@ namespace MaterialAssetRestorerCore
     [HarmonyPatch]
     internal static class LeverPatchClass
     {
+        private static string MARCDisabledHoverTip = "[ M.A.R.C. still caching materials! ]";
+        private static string PreviousDisabledHoverTip = null;
+
         [HarmonyPatch(typeof(StartMatchLever), nameof(StartMatchLever.Update)), HarmonyPostfix]
         private static void LeverPatch(StartMatchLever __instance)
         {
+            if (__instance.triggerScript.disabledHoverTip != MARCDisabledHoverTip) 
+            { 
+                PreviousDisabledHoverTip = __instance.triggerScript.disabledHoverTip;
+            }
             if (MaterialsNetworkSync.waitingPlayerCount.Value > 0)
             {
-                __instance.triggerScript.disabledHoverTip = "[ M.A.R.C. still caching materials! ]";
+                __instance.triggerScript.disabledHoverTip = MARCDisabledHoverTip;
                 __instance.triggerScript.interactable = false;
             }
             else
             {
-                if(__instance.IsServer)
-                __instance.triggerScript.interactable = true;
+                __instance.triggerScript.disabledHoverTip = PreviousDisabledHoverTip;
+                if (__instance.IsServer)
+                {
+                    
+                    __instance.triggerScript.interactable = true;
+                }
+                
             }
         }
     }
