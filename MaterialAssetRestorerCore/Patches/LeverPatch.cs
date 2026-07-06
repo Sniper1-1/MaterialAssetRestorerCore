@@ -107,7 +107,7 @@ namespace MaterialAssetRestorerCore
             else
             {
                 __instance.triggerScript.disabledHoverTip = PreviousDisabledHoverTip;
-                if (__instance.IsServer && startOfRoundInstance.inShipPhase)
+                if (__instance.IsServer && startOfRoundInstance.inShipPhase && !startOfRoundInstance.travellingToNewLevel)
                 {
 
                     __instance.triggerScript.interactable = true;
