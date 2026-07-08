@@ -39,7 +39,8 @@ namespace MaterialAssetRestorerCore
         {
             MaterialAssetRestorerCore.Logger.LogWarning($"M.A.R.C. MARCPatchingLever changed from {oldValue} to {newValue}");
         }
-
-        internal static void printDebug() { MaterialAssetRestorerCore.Logger.LogDebug("\n\n###############\nwaitingPlayerCount initialized\n###############\n"); }
+        
+        // called in plugin's Awake() so that the static class and its variables are accessed and initialized.
+        internal static void InitializeNetworkVariables(){ MaterialAssetRestorerCore.Logger.LogDebug("Initialized network variables"); }
     }
 }

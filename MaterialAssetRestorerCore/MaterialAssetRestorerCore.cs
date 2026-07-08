@@ -22,7 +22,8 @@ namespace MaterialAssetRestorerCore
         {
             Logger = base.Logger;
             Instance = this;
-            MaterialsNetworkSync.waitingPlayerCount.OnInitialized += MaterialsNetworkSync.printDebug;
+            //MaterialsNetworkSync.waitingPlayerCount.OnInitialized += MaterialsNetworkSync.printDebug;
+            MaterialsNetworkSync.InitializeNetworkVariables();
             Patch();
 
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");
