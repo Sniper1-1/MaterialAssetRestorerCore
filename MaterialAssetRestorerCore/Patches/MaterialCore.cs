@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using DunGen;
 using HarmonyLib;
-using LethalNetworkAPI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,7 +19,7 @@ namespace MaterialAssetRestorerCore
         [HarmonyPatch(typeof(StartMatchLever), nameof(StartMatchLever.Start))]
         public static void InitializeMaterialsPatch()
         {
-            CoroutineHelper.Instance.StartCoroutine(MaterialInit.InitializeMaterialsCoroutine()); 
+            CoroutineHelper.Instance.StartCoroutine(MaterialInit.InitializeMaterialsCoroutine()); //coroutine so that cachign can be done async
         }
         public static IEnumerator InitializeMaterialsCoroutine()
         {
@@ -41,7 +40,6 @@ namespace MaterialAssetRestorerCore
                     }
                 });
             }
-            yield return new WaitForSeconds(20); //debug testing. REMOVE THIS
             SceneLoadPatches.UnmuteSceneStateChangeEvents(); //allow other mods to run code on scene load/unload again
             MaterialAssetRestorerCore.Logger.LogInfo("Finished initializing materials.");
             MaterialsNetworkSync.waitingPlayerCount.Value--;

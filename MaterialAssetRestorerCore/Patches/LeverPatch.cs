@@ -1,88 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-//using Dawn.Internal;
+﻿using GameNetcodeStuff;
 using HarmonyLib;
 using UnityEngine;
 
 namespace MaterialAssetRestorerCore
 {
-    //[HarmonyPatch]
-    //internal static class LLLLeverPatch
-    //{
-    //    private static string MARCDisabledHoverTip = "[ M.A.R.C. still caching materials! ]";
-    //    private static string PreviousDisabledHoverTip = null;
-
-    //    //runs before LLL does its check for if the lever should be locked/unlocked. Once I'm done, LLL can do its checks
-    //    [HarmonyPatch(typeof(LethalLevelLoader.Patches), nameof(LethalLevelLoader.Patches.CheckLever)), HarmonyPrefix]
-    //    public static bool LeverPatch(InteractTrigger trigger)
-    //    {
-    //        if (MaterialsNetworkSync.waitingPlayerCount.Value > 0)
-    //        {
-    //            trigger.disabledHoverTip = MARCDisabledHoverTip;
-    //            trigger.interactable = false;
-    //            return false;
-    //        }
-    //        return true;
-    //    }
-    //}
-
-    //[HarmonyPatch]
-    //internal static class DawnLibLeverPatch
-    //{
-    //    [HarmonyTargetMethod]
-    //    public static MethodBase FindUnlockLever()
-    //    {
-    //        try
-    //        {
-    //            var allNested = typeof(Dawn.Internal.DawnMoonNetworker).GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Instance);
-
-    //            var stateMachineType = allNested.FirstOrDefault(t => t.Name.Contains("UnlockLever")); //get UnlockLever from DawnLib's DawnMoonNetworker
-    //            if (stateMachineType == null)
-    //            {
-    //                MaterialAssetRestorerCore.Logger.LogError("Could not find UnlockLever state machine type!");
-    //                return null;
-    //            }
-
-    //            MaterialAssetRestorerCore.Logger.LogInfo($"Found the UnlockLever");
-    //            return stateMachineType.GetMethod("MoveNext", BindingFlags.NonPublic | BindingFlags.Instance); //get MoveNext from the UnlockLever state machine, which is where the WaitUntil is
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            MaterialAssetRestorerCore.Logger.LogError($"Error in DawnLibLeverPatch.FindUnlockLeverInstruction(): {ex}");
-    //            return null;
-    //        }
-    //    }
-
-    //    [HarmonyTranspiler]
-    //    public static IEnumerable<CodeInstruction> InjectWaitInstruction(IEnumerable<CodeInstruction> instructions)
-    //    {
-    //        var waitUntilConstructor = typeof(WaitUntil).GetConstructor(new[] { typeof(Func<bool>) }); //get the constructor for WaitUntil call
-    //        bool foundWaitUntil = false;
-
-    //        foreach (var instruction in instructions)
-    //        {
-    //            if (instruction.opcode == OpCodes.Newobj && instruction.operand as ConstructorInfo == waitUntilConstructor) //if the current instruction is the constructor for WaitUntil, inject own check for materialsInitialized
-    //            {
-    //                MaterialAssetRestorerCore.Logger.LogInfo("Found WaitUntil in original UnlockLever(), injecting wait for materials.");
-    //                foundWaitUntil = true;
-    //                yield return new CodeInstruction(OpCodes.Call, typeof(DawnLibLeverPatch).GetMethod(nameof(WaitForMaterials), BindingFlags.Static | BindingFlags.Public));
-    //            }
-    //            yield return instruction; //keeps original instructions, including the original WaitUntil
-    //        }
-    //        if (!foundWaitUntil) { MaterialAssetRestorerCore.Logger.LogWarning("Never found WaitUntil constructor in MoveNext!"); }
-    //    }
-
-    //    public static Func<bool> WaitForMaterials(Func<bool> original)
-    //    {
-    //        return () => original() && MaterialsNetworkSync.waitingPlayerCount.Value <= 0;
-    //    }
-    //}
-
     [HarmonyPatch]
-    internal static class LeverPatchClass
+    internal static class MARCLeverPatchClass
     {
         private static string MARCDisabledHoverTip = "[ M.A.R.C. still caching materials! ]";
         private static string PreviousDisabledHoverTip = null;
@@ -91,29 +14,52 @@ namespace MaterialAssetRestorerCore
         [HarmonyPatch(typeof(StartMatchLever), nameof(StartMatchLever.Update)), HarmonyPostfix]
         private static void LeverPatch(StartMatchLever __instance)
         {
-            if (startOfRoundInstance == null) 
-            { 
-                startOfRoundInstance = GameObject.FindObjectOfType<StartOfRound>();
-            }
-            if (__instance.triggerScript.disabledHoverTip != MARCDisabledHoverTip)
+            if (MaterialsNetworkSync.MARCPatchingLever.Value)
             {
-                PreviousDisabledHoverTip = __instance.triggerScript.disabledHoverTip;
-            }
-            if (MaterialsNetworkSync.waitingPlayerCount.Value > 0)
-            {
-                __instance.triggerScript.disabledHoverTip = MARCDisabledHoverTip;
-                __instance.triggerScript.interactable = false;
-            }
-            else
-            {
-                __instance.triggerScript.disabledHoverTip = PreviousDisabledHoverTip;
-                if (__instance.IsServer && startOfRoundInstance.inShipPhase && !startOfRoundInstance.travellingToNewLevel)
+                if (startOfRoundInstance == null)
                 {
-
-                    __instance.triggerScript.interactable = true;
+                    startOfRoundInstance = GameObject.FindObjectOfType<StartOfRound>();
                 }
+                if (__instance.triggerScript.disabledHoverTip != MARCDisabledHoverTip) //set PreviousDisabledHoverTip for restoration later, (ingoring MARC's own)
+                {
+                    PreviousDisabledHoverTip = __instance.triggerScript.disabledHoverTip;
+                }
+                if (MaterialsNetworkSync.waitingPlayerCount.Value > 0) //keep lever locked until MARC is done
+                {
+                    __instance.triggerScript.disabledHoverTip = MARCDisabledHoverTip;
+                    __instance.triggerScript.interactable = false;
+                }
+                else
+                {
+                    __instance.triggerScript.disabledHoverTip = PreviousDisabledHoverTip; //restore the original disabledHoverTip (both LLL and DawnLib do set disabled hover tips)
 
+                    //only unlock on the server because MARC runs at the start of the game, and vanilla only lets hosts pull first
+                    //also only unlock while in orbit (not travelling)
+                    if (__instance.IsServer && startOfRoundInstance.inShipPhase && !startOfRoundInstance.travellingToNewLevel)
+                    {
+
+                        __instance.triggerScript.interactable = true;
+                    }
+
+                }
             }
+        }
+
+        [HarmonyPatch(typeof(StartMatchLever), nameof(StartMatchLever.Start)), HarmonyPrefix]
+        private static void SubscribeToLeverPull(StartMatchLever __instance)
+        {
+            if (MaterialsNetworkSync.MARCPatchingLever.Value)
+            {
+                MaterialAssetRestorerCore.Logger.LogDebug("Subscribing to lever pull event");
+                //trigger when lever is pulled (if MARC is allowed to touch the lever) to disable MARC's ability to change the lever.
+                //I don't want to interfere with LLL/DawnLib or vanilla behavior touching the lever. It should become true again though if someone joins with a latejoin mod.
+                __instance.triggerScript.onInteract.AddListener(OnLeverPulled);
+            }
+        }
+        private static void OnLeverPulled(PlayerControllerB player)
+        {
+            MaterialsNetworkSync.MARCPatchingLever.Value = false;
+            MaterialAssetRestorerCore.Logger.LogDebug("Lever pulled, M.A.R.C. patching of lever disabled");
         }
     }
 }
