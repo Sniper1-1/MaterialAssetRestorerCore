@@ -31,7 +31,10 @@ namespace MaterialAssetRestorerCore
 
             Logger.LogDebug("Patching...");
 
-            Harmony.PatchAll();
+            Harmony.PatchAll(typeof(MaterialInit));
+            Harmony.PatchAll(typeof(MaterialSwap));
+            Harmony.PatchAll(typeof(MARCLeverPatchClass));
+
             JSONManager.ReadJSONFiles();
 
             Logger.LogDebug("Finished patching!");
