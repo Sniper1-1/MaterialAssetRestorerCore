@@ -48,10 +48,10 @@ namespace MaterialAssetRestorerCore
 
     // runs after a new moon fully loads to swap the broken materials for the ones we cached at the start of the round
     [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.FinishGeneratingNewLevelClientRpc))]
-    public class WaterSwap
+    public class MaterialSwap
     {
         [HarmonyPostfix]
-        public static void SwapWaterMaterials(RoundManager __instance)
+        public static void SwapMaterials(RoundManager __instance)
         {
             Scene sceneToReplace = SceneManager.GetSceneByName(__instance.currentLevel.sceneName); //get the newly loaded moon scene (no need to search SampleSceneRelay's renders to replace)
             foreach (MaterialInformationContainer container in MaterialInit.materialInformationContainers)
