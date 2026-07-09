@@ -92,7 +92,7 @@ namespace MaterialAssetRestorerCore
             {
                 if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind && renderer.sharedMaterial.shader.name != "Hidden/InternalErrorShader") //if mods add prefabs of the same name (like Wesley's CaveWaterTile being named same as vanilla's CaveWaterTile), ensure we get the non-broken one.
                 {
-                    MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in prefab '{objToSearch}'.");
+                    MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in '{objToSearch}'.");
                     return renderer.sharedMaterial;
                 }
             }
