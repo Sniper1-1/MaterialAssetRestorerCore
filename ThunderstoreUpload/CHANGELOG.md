@@ -1,6 +1,14 @@
 
 ---
 
+**<details><summary>Version 1.1.1</summary>**
+
+ - Fixed accidentally applying scene load/unload event patches early.
+ 
+ </details>
+ 
+---
+
 **<details><summary>Version 1.1.0</summary>**
 
  - Lock ship lever while a player is caching materials.
