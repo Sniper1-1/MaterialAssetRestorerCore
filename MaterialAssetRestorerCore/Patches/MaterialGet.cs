@@ -65,6 +65,9 @@ namespace MaterialAssetRestorerCore
                 GameObject[] gameObjects = scene.GetRootGameObjects(); //only search the specified scene, avoiding searching SampleSceneRelay that's always loaded (unless it is the target scene of course)
                 foreach (GameObject gameObject in gameObjects) 
                 {
+                    if(sceneToSearch != "SampleSceneRelay") { gameObject.SetActive(false); } //disable the root gameobjects of the scene to avoid
+                                                                                             //`Cascade Shadow atlasing has failed, only one directional light can cast shadows at a time`
+                                                                                             //which caused flashing lighting
                     materialToReturn = GetFromRenderers(gameObject, materialToFind);
                     if (materialToReturn != null){break; } //stop checking gameobjects after material is found
                 }
