@@ -1,6 +1,14 @@
 
 ---
 
+**<details><summary>Version 1.1.2</summary>**
+
+ - Fixed `Cascade Shadow atlasing has failed, only one directional light can cast shadows at a time` error that was occuring when trying to load a scene (made lighting flash briefly) to cache materials. Thanks [Lunxara](https://www.twitch.tv/lunxara) for noting the epilepsy risk and [Pacoito](https://thunderstore.io/c/lethal-company/p/pacoito/) for suggesting a fix.
+ 
+ </details>
+ 
+---
+
 **<details><summary>Version 1.1.1</summary>**
 
  - Fixed accidentally applying scene load/unload event patches early.

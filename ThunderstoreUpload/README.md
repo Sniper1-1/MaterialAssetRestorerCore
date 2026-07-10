@@ -4,7 +4,7 @@ Moon and interior devs are likely familiar with how poorly the certain assets ri
 
 This mod works by searching through a moon after it is loaded to replace the broken ones from modded moons/interiors with the corresponding one from vanilla. API specs and example useage below.
 
-NOTE: IN ORDER TO ACCESS VANILLA MATERIALS FROM SCENES, THEY ARE BRIEFLY LOADED DURING `StartOfRound`. FROM MY TESTING THIS DID NOT CAUSE MAJOR PERMANENT ISSUES, BUT A FEW ERRORS LIKE `[Error  : Unity Log] Cascade Shadow atlasing has failed, only one directional light can cast shadows at a time` AND OTHER WARNINGS MAY BRIEFLY LOG. AGAIN, I DO NOT BELIEVE THIS CAUSES ANY MAJOR ISSUES LONG TERM.
+NOTE: IN ORDER TO ACCESS VANILLA MATERIALS FROM SCENES, THEY ARE BRIEFLY LOADED DURING `StartOfRound`. FROM MY TESTING THIS DID NOT CAUSE MAJOR PERMANENT ISSUES.
 
 ## API Docs For Devs
 
