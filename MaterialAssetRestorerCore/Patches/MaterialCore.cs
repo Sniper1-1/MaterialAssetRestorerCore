@@ -71,22 +71,36 @@ namespace MaterialAssetRestorerCore
     /// <c>PrefabName</c> - The name of the prefab to search within.
     /// <c>SceneName</c> - The name of the scene to search within.
     /// <c>replacementMaterial</c> - The material itself to use as a replacement, found at runtime.
+    /// <c>MaterialSource</c> - The type of the source material (from either Renderer, TerrainDetails, ParticleSystem, or VFX).
+    /// <c>MaterialDestination</c> - The type of the destination material (replace into either Renderer, TerrainDetails, ParticleSystem, or VFX).
     /// </summary>
     public class MaterialInformationContainer
     {
-        public MaterialInformationContainer(string materialToFindName, string materialToReplaceName, string prefabToSearchName, string sceneToSearchName, Material replacementMaterial)
+        public MaterialInformationContainer(string materialToFindName, string materialToReplaceName, string prefabToSearchName, string sceneToSearchName, Material replacementMaterial, MaterialType materialSource, MaterialType materialDestination)
         {
             this.BaseMaterial = materialToFindName;
             this.ReplaceMaterial = materialToReplaceName;
             this.PrefabName = prefabToSearchName;
             this.SceneName = sceneToSearchName;
             this.replacementMaterial = replacementMaterial;
+            this.MaterialSource = materialSource;
+            this.MaterialDestination = materialDestination;
         }
         public string BaseMaterial = null;
         public string ReplaceMaterial = null;
         public string PrefabName = null;
         public string SceneName = null;
         public Material replacementMaterial = null;
+        public enum MaterialType
+        {
+            Renderer,
+            TerrainDetails,
+            ParticleSystem,
+            VFX
+        }
+        // These fields can be null for backwards compatibility
+        public MaterialType? MaterialSource=MaterialType.Renderer; 
+        public MaterialType? MaterialDestination=MaterialType.Renderer;
     }
 
     //patch scene load/unload to prevent other mods from running things if they are subscribed to these events

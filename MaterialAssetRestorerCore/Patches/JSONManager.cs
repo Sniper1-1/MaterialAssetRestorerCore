@@ -55,13 +55,14 @@ namespace MaterialAssetRestorerCore
                                     MaterialAssetRestorerCore.Logger.LogWarning($"Skipping entry in '{file.Name}': While both aren't needed, either a valid 'PrefabName' or 'SceneName' is required.");
                                     continue;
                                 }
-
+                                
                                 // add it to the list of material information containers if valid
                                 MaterialInit.materialInformationContainers.Add(container);
                                 MaterialAssetRestorerCore.Logger.LogDebug(
                                     $"Registered: '{container.BaseMaterial}' -> '{container.ReplaceMaterial}'" +
                                     (container.SceneName != null ? $" in scene '{container.SceneName}'" : "") +
-                                    (container.PrefabName != null ? $" from prefab '{container.PrefabName}'" : "")
+                                    (container.PrefabName != null ? $" from prefab '{container.PrefabName}'" : "") +
+                                    $" (Source: {container.MaterialSource.Value}, Destination: {container.MaterialDestination.Value})"
                                 );
                             }
                         }
