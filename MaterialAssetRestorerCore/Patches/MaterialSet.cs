@@ -11,28 +11,59 @@ namespace MaterialAssetRestorerCore
         /// <param name="original">The original material name.</param>
         /// <param name="replacement">The replacement material.</param>
         /// <param name="sceneToReplace">The scene to perform the replacement in.</param>
-        public static void SET_material(string original, Material replacement, Scene sceneToReplace)
+        /// <param name="materialDestination">The type of the destination material (optional).</param>"
+        public static void SET_material(string original, Material replacement, Scene sceneToReplace, MaterialInformationContainer.MaterialType? materialDestination=null)
         {
             foreach (GameObject rootObj in sceneToReplace.GetRootGameObjects())
             {
-                foreach (var renderer in rootObj.GetComponentsInChildren<Renderer>(true))
+                //replace materials in renderers (default)
+                if (materialDestination == null || materialDestination == MaterialInformationContainer.MaterialType.Renderer)
                 {
-                    var sharedMaterials = renderer.sharedMaterials;
-                    bool changed = false;
-                    for (int i = 0; i < sharedMaterials.Length; i++)
+                    foreach (var renderer in rootObj.GetComponentsInChildren<Renderer>(true))
                     {
-                        if (sharedMaterials[i] != null && sharedMaterials[i].name == original)
+                        var sharedMaterials = renderer.sharedMaterials;
+                        bool changed = false;
+                        for (int i = 0; i < sharedMaterials.Length; i++)
                         {
-                            sharedMaterials[i] = replacement;
-                            changed = true;
-                            MaterialAssetRestorerCore.Logger.LogInfo($"Replaced material '{original}' with '{replacement.name}' in renderer '{renderer.gameObject.name}' in scene '{sceneToReplace.name}'.");
+                            if (sharedMaterials[i] != null && sharedMaterials[i].name == original)
+                            {
+                                sharedMaterials[i] = replacement;
+                                changed = true;
+                                MaterialAssetRestorerCore.Logger.LogInfo($"Replaced material '{original}' with '{replacement.name}' in renderer '{renderer.gameObject.name}' in scene '{sceneToReplace.name}'.");
+                            }
+                        }
+                        if (changed)
+                        {
+                            renderer.sharedMaterials = sharedMaterials;
                         }
                     }
-                    if (changed)
-                    {
-                        renderer.sharedMaterials = sharedMaterials;
-                    }
                 }
+                //replace materials in particle systems
+                else if (materialDestination == MaterialInformationContainer.MaterialType.ParticleSystem)
+                {
+                    foreach (var particleSystem in rootObj.GetComponentsInChildren<ParticleSystem>(true))
+                    {
+                        var system = particleSystem.GetComponent<ParticleSystemRenderer>();
+                        if (system != null)
+                        {
+                            var sharedMaterials = system.sharedMaterials;
+                            bool changed = false;
+                            for (int i = 0; i < sharedMaterials.Length; i++)
+                            {
+                                if (sharedMaterials[i] != null && sharedMaterials[i].name == original)
+                                {
+                                    sharedMaterials[i] = replacement;
+                                    changed = true;
+                                    MaterialAssetRestorerCore.Logger.LogInfo($"Replaced material '{original}' with '{replacement.name}' in particle system '{particleSystem.gameObject.name}' in scene '{sceneToReplace.name}'.");
+                                }
+                            }
+                            if (changed)
+                            {
+                                system.sharedMaterials = sharedMaterials;
+                            }
+                        }
+                    }
+                }   
             }
         }
     }

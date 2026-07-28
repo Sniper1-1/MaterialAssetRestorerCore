@@ -32,7 +32,7 @@ namespace MaterialAssetRestorerCore
             MaterialAssetRestorerCore.Logger.LogInfo("Initializing materials...");
             foreach (MaterialInformationContainer container in materialInformationContainers)
             {
-                yield return MaterialGet.GET_material(container.BaseMaterial, container.PrefabName, container.SceneName, (foundMaterial) =>
+                yield return MaterialGet.GET_material(container.BaseMaterial, container.PrefabName, container.SceneName, container.MaterialSource, (foundMaterial) =>
                 {
                     if (foundMaterial != null)
                     {
@@ -58,7 +58,7 @@ namespace MaterialAssetRestorerCore
             {
                 if (container.replacementMaterial != null)
                 {
-                    MaterialSet.SET_material(container.ReplaceMaterial, container.replacementMaterial, sceneToReplace);
+                    MaterialSet.SET_material(container.ReplaceMaterial, container.replacementMaterial, sceneToReplace, container.MaterialDestination);
                 }
             }
         }
