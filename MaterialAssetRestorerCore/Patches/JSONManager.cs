@@ -55,11 +55,6 @@ namespace MaterialAssetRestorerCore
                                     MaterialAssetRestorerCore.Logger.LogWarning($"Skipping entry in '{file.Name}': While both aren't needed, either a valid 'PrefabName' or 'SceneName' is required.");
                                     continue;
                                 }
-                                if (container.MaterialSource.Value==MaterialInformationContainer.MaterialType.TerrainDetails)
-                                {
-                                    MaterialAssetRestorerCore.Logger.LogWarning($"Skipping entry in '{file.Name}': 'TerrainDetails' is not supported as a material source. Please use its prefab and renderer instead.");
-                                    continue;
-                                }
                                 
                                 // add it to the list of material information containers if valid
                                 MaterialInit.materialInformationContainers.Add(container);
