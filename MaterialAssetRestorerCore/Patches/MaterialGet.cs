@@ -37,6 +37,7 @@ namespace MaterialAssetRestorerCore
                         MaterialAssetRestorerCore.Logger.LogDebug($"Found a prefab '{prefabToSearch}'.");
                         if(materialSource == null || materialSource == MaterialInformationContainer.MaterialType.Renderer){materialToReturn = GetFromRenderers(prefab, materialToFind);}
                         if (materialSource == MaterialInformationContainer.MaterialType.ParticleSystem) { materialToReturn = GetFromParticleSystems(prefab, materialToFind); }
+                        if (materialSource == MaterialInformationContainer.MaterialType.TerrainDetails) { materialToReturn = GetFromTerrainDetails(prefab, materialToFind); }
                         if (materialToReturn != null){break;} //only stop checking prefabs after matierial is found as there may be multiple prefabs with the same name
                     }
                 }
@@ -71,6 +72,7 @@ namespace MaterialAssetRestorerCore
                                                                                              //which caused flashing lighting
                     if(materialSource == null || materialSource == MaterialInformationContainer.MaterialType.Renderer){materialToReturn = GetFromRenderers(gameObject, materialToFind);}
                     if(materialSource == MaterialInformationContainer.MaterialType.ParticleSystem){materialToReturn = GetFromParticleSystems(gameObject, materialToFind);}
+                    if (materialSource == MaterialInformationContainer.MaterialType.TerrainDetails) { materialToReturn = GetFromTerrainDetails(gameObject, materialToFind); }
                     if (materialToReturn != null){break; } //stop checking gameobjects after material is found
                 }
 
@@ -97,7 +99,7 @@ namespace MaterialAssetRestorerCore
             {
                 if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind && renderer.sharedMaterial.shader.name != "Hidden/InternalErrorShader") //if mods add prefabs of the same name (like Wesley's CaveWaterTile being named same as vanilla's CaveWaterTile), ensure we get the non-broken one.
                 {
-                    MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in '{objToSearch}'.");
+                    MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in '{objToSearch.name}''s renderers.");
                     return renderer.sharedMaterial;
                 }
             }
@@ -113,10 +115,37 @@ namespace MaterialAssetRestorerCore
         {
             foreach (ParticleSystemRenderer system in objToSearch.GetComponentsInChildren<ParticleSystemRenderer>(true))
             {
-                if (system.sharedMaterial != null && system.sharedMaterial.name == materialToFind && system.sharedMaterial.shader.name != "Hidden/InternalErrorShader") //if mods add prefabs of the same name (like Wesley's CaveWaterTile being named same as vanilla's CaveWaterTile), ensure we get the non-broken one.
+                if (system.sharedMaterial != null && system.sharedMaterial.name == materialToFind && system.sharedMaterial.shader.name != "Hidden/InternalErrorShader")
                 {
-                    MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in '{objToSearch}'.");
+                    MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in '{objToSearch.name}''s particle systems.");
                     return system.sharedMaterial;
+                }
+            }
+            return null;
+        }
+        /// <summary>
+        /// Takes a GameObject and checks all of its and its children's TerrainDetails for the material, returning it if found.
+        /// </summary>
+        /// <param name="objToSearch">The GameObject to search through (including its children).</param>
+        /// <param name="materialToFind">The name of the material to find.</param>
+        /// <returns>The found material, or null if not found.</returns>
+        private static Material GetFromTerrainDetails(GameObject objToSearch, string materialToFind)
+        {
+            foreach (Terrain terrain in objToSearch.GetComponentsInChildren<Terrain>(true))
+            {
+                foreach (DetailPrototype detail in terrain.terrainData.detailPrototypes)
+                {
+                    if (detail.prototype != null)
+                    {
+                        foreach (Renderer renderer in detail.prototype.GetComponentsInChildren<Renderer>(true))
+                        {
+                            if (renderer.sharedMaterial != null && renderer.sharedMaterial.name == materialToFind && renderer.sharedMaterial.shader.name != "Hidden/InternalErrorShader")
+                            {
+                                MaterialAssetRestorerCore.Logger.LogDebug($"Found material '{materialToFind}' in '{objToSearch.name}'s detail prototype.");
+                                return renderer.sharedMaterial;
+                            }
+                        }
+                    }
                 }
             }
             return null;
