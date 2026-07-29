@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.SceneManagement;
 
 namespace MaterialAssetRestorerCore
@@ -63,7 +64,41 @@ namespace MaterialAssetRestorerCore
                             }
                         }
                     }
-                }   
+                }
+                //replace materials in TerrainDetails
+                if (materialDestination == MaterialInformationContainer.MaterialType.TerrainDetails)
+                {
+                    foreach (var terrain in rootObj.GetComponentsInChildren<Terrain>(true))
+                    {
+                        var terrainData = terrain.terrainData;
+                        if (terrainData != null)
+                        {
+                            var terrainDetails = terrainData.detailPrototypes;
+                            bool changed = false;
+                            for (int i = 0; i < terrainDetails.Length; i++)
+                            {
+                                if (terrainDetails[i].prototype != null)
+                                {
+                                    var terrainDetailRenderer = terrainDetails[i].prototype.GetComponent<Renderer>().sharedMaterials;
+                                    for (int j = 0; j < terrainDetailRenderer.Length; j++)
+                                    {
+                                        if (terrainDetailRenderer[j] != null && terrainDetailRenderer[j].name == original)
+                                        {
+                                            terrainDetailRenderer[j] = replacement;
+                                            changed = true;
+                                            MaterialAssetRestorerCore.Logger.LogInfo($"Replaced material '{original}' with '{replacement.name}' in terrain detail '{terrainDetails[i].prototype.name}' in scene '{sceneToReplace.name}'.");
+                                        }
+                                    }
+                                    if (changed)
+                                    {
+                                        terrainDetails[i].prototype.GetComponent<Renderer>().sharedMaterials = terrainDetailRenderer;
+                                        terrainData.RefreshPrototypes(); // they don't render without a refresh
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
