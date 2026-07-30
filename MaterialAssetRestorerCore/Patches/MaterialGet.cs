@@ -161,7 +161,7 @@ namespace MaterialAssetRestorerCore
                 if (vfx.visualEffectAsset != null && vfx.visualEffectAsset.name==materialToFind)
                 {
                     MaterialAssetRestorerCore.Logger.LogDebug($"Found vfx '{materialToFind}' in '{objToSearch.name}''s visual effects.");
-                    return Object.Instantiate(vfx.visualEffectAsset);
+                    return vfx.visualEffectAsset;
                 }
             }
             return null;

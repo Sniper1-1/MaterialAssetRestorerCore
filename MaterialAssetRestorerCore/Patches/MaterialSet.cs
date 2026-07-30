@@ -105,10 +105,11 @@ namespace MaterialAssetRestorerCore
                     foreach (VisualEffect vfx in rootObj.GetComponentsInChildren<VisualEffect>(true))
                     {
                         bool changed = false;
-                        if (vfx != null && vfx.visualEffectAsset.name == original)
+                        if(vfx != null &&vfx.visualEffectAsset!=null && vfx.visualEffectAsset.name == original)
                         {
                             vfx.visualEffectAsset = (VisualEffectAsset)replacement;
                             vfx.Reinit(); // forces the component to recompile and reinitialize with the new asset
+                            changed = true;
                             MaterialAssetRestorerCore.Logger.LogInfo($"Replaced vfx '{original}' with '{replacement.name}' in vfx '{vfx.name}' in scene '{sceneToReplace.name}'.");
                         }
                     }
