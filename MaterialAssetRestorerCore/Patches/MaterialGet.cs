@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.VFX;
 
 namespace MaterialAssetRestorerCore
 {
@@ -15,9 +16,9 @@ namespace MaterialAssetRestorerCore
         /// <param name="materialSource">The type of the source material (optional).</param>
         /// <param name="onComplete">Callback invoked with the found material, or null if not found.</param>
         /// <returns>An IEnumerator to be used with StartCoroutine.</returns>
-        public static IEnumerator GET_material(string materialToFind, string prefabToSearch=null, string sceneToSearch=null, MaterialInformationContainer.MaterialType? materialSource=null, System.Action<Material> onComplete = null) 
+        public static IEnumerator GET_material(string materialToFind, string prefabToSearch=null, string sceneToSearch=null, MaterialInformationContainer.MaterialType? materialSource=null, System.Action<UnityEngine.Object> onComplete = null) 
         {            
-            Material materialToReturn = null;
+            Object materialToReturn = null;
 
             if (string.IsNullOrEmpty(materialToFind)) 
             {
@@ -35,9 +36,10 @@ namespace MaterialAssetRestorerCore
                     if (prefab.name == prefabToSearch)
                     {
                         MaterialAssetRestorerCore.Logger.LogDebug($"Found a prefab '{prefabToSearch}'.");
-                        if(materialSource == null || materialSource == MaterialInformationContainer.MaterialType.Renderer){materialToReturn = GetFromRenderers(prefab, materialToFind);}
+                        if (materialSource == null || materialSource == MaterialInformationContainer.MaterialType.Renderer){ materialToReturn = GetFromRenderers(prefab, materialToFind); }
                         if (materialSource == MaterialInformationContainer.MaterialType.ParticleSystem) { materialToReturn = GetFromParticleSystems(prefab, materialToFind); }
                         if (materialSource == MaterialInformationContainer.MaterialType.TerrainDetails) { materialToReturn = GetFromTerrainDetails(prefab, materialToFind); }
+                        if (materialSource == MaterialInformationContainer.MaterialType.VFX) { materialToReturn = GetFromVFX(prefab, materialToFind);}
                         if (materialToReturn != null){break;} //only stop checking prefabs after matierial is found as there may be multiple prefabs with the same name
                     }
                 }
@@ -73,6 +75,7 @@ namespace MaterialAssetRestorerCore
                     if(materialSource == null || materialSource == MaterialInformationContainer.MaterialType.Renderer){materialToReturn = GetFromRenderers(gameObject, materialToFind);}
                     if(materialSource == MaterialInformationContainer.MaterialType.ParticleSystem){materialToReturn = GetFromParticleSystems(gameObject, materialToFind);}
                     if (materialSource == MaterialInformationContainer.MaterialType.TerrainDetails) { materialToReturn = GetFromTerrainDetails(gameObject, materialToFind); }
+                    if (materialSource == MaterialInformationContainer.MaterialType.VFX) { materialToReturn = GetFromVFX(gameObject, materialToFind); }
                     if (materialToReturn != null){break; } //stop checking gameobjects after material is found
                 }
 
@@ -146,6 +149,19 @@ namespace MaterialAssetRestorerCore
                             }
                         }
                     }
+                }
+            }
+            return null;
+        }
+
+        private static VisualEffectAsset GetFromVFX(GameObject objToSearch, string materialToFind)
+        {
+            foreach (VisualEffect vfx in objToSearch.GetComponentsInChildren<VisualEffect>(true))
+            {
+                if (vfx.visualEffectAsset != null && vfx.visualEffectAsset.name==materialToFind)
+                {
+                    MaterialAssetRestorerCore.Logger.LogDebug($"Found vfx '{materialToFind}' in '{objToSearch.name}''s visual effects.");
+                    return Object.Instantiate(vfx.visualEffectAsset);
                 }
             }
             return null;

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.SceneManagement;
+using UnityEngine.VFX;
 
 namespace MaterialAssetRestorerCore
 {
@@ -9,11 +10,11 @@ namespace MaterialAssetRestorerCore
         /// <summary>
         /// Goes through all renderers in the scene and replaces the material with the original name with the replacement material.
         /// </summary>
-        /// <param name="original">The original material name.</param>
-        /// <param name="replacement">The replacement material.</param>
+        /// <param name="original">The original material/vfx name.</param>
+        /// <param name="replacement">The replacement material/vfx.</param>
         /// <param name="sceneToReplace">The scene to perform the replacement in.</param>
         /// <param name="materialDestination">The type of the destination material (optional).</param>"
-        public static void SET_material(string original, Material replacement, Scene sceneToReplace, MaterialInformationContainer.MaterialType? materialDestination=null)
+        public static void SET_material(string original, Object replacement, Scene sceneToReplace, MaterialInformationContainer.MaterialType? materialDestination=null)
         {
             foreach (GameObject rootObj in sceneToReplace.GetRootGameObjects())
             {
@@ -28,7 +29,7 @@ namespace MaterialAssetRestorerCore
                         {
                             if (sharedMaterials[i] != null && sharedMaterials[i].name == original)
                             {
-                                sharedMaterials[i] = replacement;
+                                sharedMaterials[i] = (Material)replacement;
                                 changed = true;
                                 MaterialAssetRestorerCore.Logger.LogInfo($"Replaced material '{original}' with '{replacement.name}' in renderer '{renderer.gameObject.name}' in scene '{sceneToReplace.name}'.");
                             }
@@ -53,7 +54,7 @@ namespace MaterialAssetRestorerCore
                             {
                                 if (sharedMaterials[i] != null && sharedMaterials[i].name == original)
                                 {
-                                    sharedMaterials[i] = replacement;
+                                    sharedMaterials[i] = (Material)replacement;
                                     changed = true;
                                     MaterialAssetRestorerCore.Logger.LogInfo($"Replaced material '{original}' with '{replacement.name}' in particle system '{particleSystem.gameObject.name}' in scene '{sceneToReplace.name}'.");
                                 }
@@ -84,7 +85,7 @@ namespace MaterialAssetRestorerCore
                                     {
                                         if (terrainDetailRenderer[j] != null && terrainDetailRenderer[j].name == original)
                                         {
-                                            terrainDetailRenderer[j] = replacement;
+                                            terrainDetailRenderer[j] = (Material)replacement;
                                             changed = true;
                                             MaterialAssetRestorerCore.Logger.LogInfo($"Replaced material '{original}' with '{replacement.name}' in terrain detail '{terrainDetails[i].prototype.name}' in scene '{sceneToReplace.name}'.");
                                         }
@@ -96,6 +97,19 @@ namespace MaterialAssetRestorerCore
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+                if (materialDestination == MaterialInformationContainer.MaterialType.VFX) 
+                { 
+                    foreach (VisualEffect vfx in rootObj.GetComponentsInChildren<VisualEffect>(true))
+                    {
+                        bool changed = false;
+                        if (vfx != null && vfx.visualEffectAsset.name == original)
+                        {
+                            vfx.visualEffectAsset = (VisualEffectAsset)replacement;
+                            vfx.Reinit(); // forces the component to recompile and reinitialize with the new asset
+                            MaterialAssetRestorerCore.Logger.LogInfo($"Replaced vfx '{original}' with '{replacement.name}' in vfx '{vfx.name}' in scene '{sceneToReplace.name}'.");
                         }
                     }
                 }

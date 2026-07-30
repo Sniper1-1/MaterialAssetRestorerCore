@@ -4,6 +4,7 @@ using DunGen;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.VFX;
 
 
 namespace MaterialAssetRestorerCore
@@ -70,7 +71,7 @@ namespace MaterialAssetRestorerCore
     /// <c>ReplaceMaterial</c> - The name of the material to replace.
     /// <c>PrefabName</c> - The name of the prefab to search within.
     /// <c>SceneName</c> - The name of the scene to search within.
-    /// <c>replacementMaterial</c> - The material itself to use as a replacement, found at runtime.
+    /// <c>replacementMaterial</c> - The material/vfx itself to use as a replacement, found at runtime.
     /// <c>MaterialSource</c> - The type of the source material (from either Renderer, TerrainDetails, ParticleSystem, or VFX).
     /// <c>MaterialDestination</c> - The type of the destination material (replace into either Renderer, TerrainDetails, ParticleSystem, or VFX).
     /// </summary>
@@ -90,7 +91,7 @@ namespace MaterialAssetRestorerCore
         public string ReplaceMaterial = null;
         public string PrefabName = null;
         public string SceneName = null;
-        public Material replacementMaterial = null;
+        public Object replacementMaterial = null;
         public enum MaterialType
         {
             Renderer,
