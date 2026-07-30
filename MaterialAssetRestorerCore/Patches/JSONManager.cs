@@ -55,6 +55,20 @@ namespace MaterialAssetRestorerCore
                                     MaterialAssetRestorerCore.Logger.LogWarning($"Skipping entry in '{file.Name}': While both aren't needed, either a valid 'PrefabName' or 'SceneName' is required.");
                                     continue;
                                 }
+                                if (
+                                    (container.MaterialSource.Value==MaterialInformationContainer.MaterialType.VFX && container.MaterialDestination.Value != MaterialInformationContainer.MaterialType.VFX)
+                                    ||
+                                    (container.MaterialDestination.Value == MaterialInformationContainer.MaterialType.VFX && container.MaterialSource.Value != MaterialInformationContainer.MaterialType.VFX)
+                                   )
+                                {
+                                    MaterialAssetRestorerCore.Logger.LogWarning($"Skipping entry in '{file.Name}': VFX must be paired with VFX");
+                                    continue;
+                                }
+                                if (container.MaterialSource.Value==MaterialInformationContainer.MaterialType.TerrainDetails && string.IsNullOrEmpty(container.SceneName))
+                                {
+                                    MaterialAssetRestorerCore.Logger.LogWarning($"Skipping entry in '{file.Name}': TerrainDetails as a 'MaterialSource' must have a valid 'SceneName'");
+                                    continue;
+                                }
                                 
                                 // add it to the list of material information containers if valid
                                 MaterialInit.materialInformationContainers.Add(container);
