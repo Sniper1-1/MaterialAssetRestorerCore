@@ -64,7 +64,7 @@ namespace MaterialAssetRestorerCore
                                     MaterialAssetRestorerCore.Logger.LogWarning($"Skipping entry in '{file.Name}': VFX must be paired with VFX");
                                     continue;
                                 }
-                                if (container.MaterialSource.Value==MaterialInformationContainer.MaterialType.TerrainDetails && string.IsNullOrEmpty(container.SceneName))
+                                if (container.MaterialSource.Value==MaterialInformationContainer.MaterialType.TerrainDetail && string.IsNullOrEmpty(container.SceneName))
                                 {
                                     MaterialAssetRestorerCore.Logger.LogWarning($"Skipping entry in '{file.Name}': TerrainDetails as a 'MaterialSource' must have a valid 'SceneName'");
                                     continue;

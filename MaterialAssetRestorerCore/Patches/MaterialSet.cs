@@ -67,7 +67,7 @@ namespace MaterialAssetRestorerCore
                     }
                 }
                 //replace materials in TerrainDetails
-                if (materialDestination == MaterialInformationContainer.MaterialType.TerrainDetails)
+                if (materialDestination == MaterialInformationContainer.MaterialType.TerrainDetail)
                 {
                     foreach (var terrain in rootObj.GetComponentsInChildren<Terrain>(true))
                     {

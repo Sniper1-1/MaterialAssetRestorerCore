@@ -95,7 +95,7 @@ namespace MaterialAssetRestorerCore
         public enum MaterialType
         {
             Renderer,
-            TerrainDetails,
+            TerrainDetail,
             ParticleSystem,
             VFX
         }

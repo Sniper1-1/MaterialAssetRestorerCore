@@ -38,7 +38,7 @@ namespace MaterialAssetRestorerCore
                         MaterialAssetRestorerCore.Logger.LogDebug($"Found a prefab '{prefabToSearch}'.");
                         if (materialSource == null || materialSource == MaterialInformationContainer.MaterialType.Renderer){ materialToReturn = GetFromRenderers(prefab, materialToFind); }
                         if (materialSource == MaterialInformationContainer.MaterialType.ParticleSystem) { materialToReturn = GetFromParticleSystems(prefab, materialToFind); }
-                        if (materialSource == MaterialInformationContainer.MaterialType.TerrainDetails) { materialToReturn = GetFromTerrainDetails(prefab, materialToFind); }
+                        if (materialSource == MaterialInformationContainer.MaterialType.TerrainDetail) { materialToReturn = GetFromTerrainDetails(prefab, materialToFind); }
                         if (materialSource == MaterialInformationContainer.MaterialType.VFX) { materialToReturn = GetFromVFX(prefab, materialToFind);}
                         if (materialToReturn != null){break;} //only stop checking prefabs after matierial is found as there may be multiple prefabs with the same name
                     }
@@ -74,7 +74,7 @@ namespace MaterialAssetRestorerCore
                                                                                              //which caused flashing lighting
                     if(materialSource == null || materialSource == MaterialInformationContainer.MaterialType.Renderer){materialToReturn = GetFromRenderers(gameObject, materialToFind);}
                     if(materialSource == MaterialInformationContainer.MaterialType.ParticleSystem){materialToReturn = GetFromParticleSystems(gameObject, materialToFind);}
-                    if (materialSource == MaterialInformationContainer.MaterialType.TerrainDetails) { materialToReturn = GetFromTerrainDetails(gameObject, materialToFind); }
+                    if (materialSource == MaterialInformationContainer.MaterialType.TerrainDetail) { materialToReturn = GetFromTerrainDetails(gameObject, materialToFind); }
                     if (materialSource == MaterialInformationContainer.MaterialType.VFX) { materialToReturn = GetFromVFX(gameObject, materialToFind); }
                     if (materialToReturn != null){break; } //stop checking gameobjects after material is found
                 }
