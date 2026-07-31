@@ -1,6 +1,14 @@
 
 ---
 
+**<details><summary>Version 2.0.0</summary>**
+
+ - Now supports pulling materials from and inserting to particle systems, terrain details, and even VFX in addition to regular mesh renderers through use of the `MaterialSource` and `MaterialDestination` fields. If ommitted, `Renderer` is default.
+ 
+ </details>
+ 
+---
+
 **<details><summary>Version 1.1.2</summary>**
 
  - Fixed `Cascade Shadow atlasing has failed, only one directional light can cast shadows at a time` error that was occuring when trying to load a scene (made lighting flash briefly) to cache materials. Thanks [Lunxara](https://www.twitch.tv/lunxara) for noting the epilepsy risk and [Pacoito](https://thunderstore.io/c/lethal-company/p/pacoito/) for suggesting a fix.
