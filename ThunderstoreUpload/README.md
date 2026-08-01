@@ -8,19 +8,25 @@ NOTE: IN ORDER TO ACCESS VANILLA MATERIALS FROM SCENES, THEY ARE BRIEFLY LOADED 
 
 ## API Docs For Devs
 
-Create a json file (or multiple) with the format and in the direcotry shown below. Each json contains a list of `MaterialSets`. A `MaterialSet` is made up of a `BaseMaterial`, which is the name of the material in the vanilla game, and a `ReplaceMaterial`, which is the name of the material in your mod. Often these will likely be the same name, but they don't have to be. You must also specify either a `PrefabName` or a `SceneName` so that this tool knows where to look to find the `BaseMaterial`. 
+Create a json file (or multiple) with the format and in the direcotry shown below. Each json contains a list of `MaterialSets`. A `MaterialSet` is made up of a `BaseMaterial`, which is the name of the material in the vanilla game, and a `ReplaceMaterial`, which is the name of the material in your mod. Often these will likely be the same name, but they don't have to be. You must also specify either a `PrefabName` or a `SceneName` so that this tool knows where to look to find the `BaseMaterial`.
+
+Additionally, the fields `MaterialSource` and `MaterialDestination` may be supplied but are optional. They accept the following options: `Renderer` (default if field ommitted), `TerrainDetails`, `ParticleSystem` and `VFX` (`VFX` must pair with `VFX` and is based on what is set in the visual effect component's "Asset Template" field in the Unity editor). The source and destination type is used to specify what type of thing you are attempting to pull out of and replace into, respectively.
 ```
 {
     "MaterialSets": [
         {
             "BaseMaterial" : "gamematerial",
             "ReplaceMaterial" : "yourmaterial",
-            "PrefabName" : "gameprefab"
+            "PrefabName" : "gameprefab",
+            "MaterialSource" : "Renderer",
+            "MaterialDestination" : "Renderer"
         },
         {
             "BaseMaterial" : "gamematerial",
             "ReplaceMaterial" : "yourmaterial",
-            "SceneName" : "gamescene"
+            "SceneName" : "gamescene",
+            "MaterialSource" : "ParticleSystem",
+            "MaterialDestination" : "ParticleSystem"
         }
     ]
 }

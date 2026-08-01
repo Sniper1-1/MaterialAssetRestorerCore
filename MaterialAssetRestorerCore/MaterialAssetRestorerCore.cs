@@ -5,8 +5,6 @@ using HarmonyLib;
 namespace MaterialAssetRestorerCore
 {
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-    [BepInDependency("LethalLevelLoader",BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency("DawnLib",BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("LethalNetworkAPI", BepInDependency.DependencyFlags.HardDependency)]
     public class MaterialAssetRestorerCore : BaseUnityPlugin
     {
